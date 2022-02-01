@@ -8,3 +8,11 @@ def welcome_msg():
     """
 
     print("Welcome to WeThinkCode's Code Clinic Booking System.")
+
+
+def login_results():
+    """
+    Function displays the login results, when a user attempts to login.
+    """
+
+    print('Login successfull')
