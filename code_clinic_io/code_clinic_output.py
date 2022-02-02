@@ -20,8 +20,12 @@ def login_results():
 
 
 def display_help():
-    """It displays the range of commands to the user
+    """It displays the range of commands to the user, when a user
     """
-    
+
     comm.help_command()
-    
+
+
+def login_prompt(username):
+
+    print(f'{username}: Please login')

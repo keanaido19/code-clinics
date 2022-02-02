@@ -68,3 +68,10 @@ def create_config_file():
     if not check_if_config_file_exists():
         with open(get_path_to_config_file(), 'w') as file_object:
             pass
+
+
+def get_username():
+
+    with open(get_path_to_config_file(), 'r') as config:
+        config_data = json.load(config)
+        return config_data['email']

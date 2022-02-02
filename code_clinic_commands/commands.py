@@ -2,9 +2,13 @@
 Commands for the WTC Code Clinic Booking System.
 
 """
+import code_clinic_config
+from code_clinic_authentication import code_clinic_token
+
 
 def login():
-    pass
+    user_name = code_clinic_config.get_username()
+    code_clinic_token.get_user_token(user_name)
 
 
 def command_handler(command_arg):
@@ -17,7 +21,7 @@ def command_handler(command_arg):
     elif command_arg == 'clinic_calendar':
         pass
 
-    
+
 def help_command():
     """Contains a list of valid commands.
     """
