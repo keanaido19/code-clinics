@@ -2,7 +2,6 @@
 Output functions for Code Clinic Booking System
 
 """
-import code_clinic_commands.commands as comm
 
 def welcome_msg():
     """It displays a welcome message to the user.
@@ -16,14 +15,19 @@ def login_results():
     Function displays the login results, when a user attempts to login.
     """
 
-    print('Login successfull')
+    print('Login successful')
 
 
 def display_help():
-    """It displays the range of commands to the user, when a user
+    """
+    It displays the range of commands to the user, when a user
     """
 
-    comm.help_command()
+    print("""Here is a list of valid commands:
+> login - Enables the user to login to the system
+> student_calendar - Allows the user to view their student calendar
+> volunteer_calendar - Allows the user to view the code clinic calendar 
+""")
 
 
 def login_prompt(username):
