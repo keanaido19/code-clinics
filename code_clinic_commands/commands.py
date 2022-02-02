@@ -2,6 +2,7 @@
 Commands for the WTC Code Clinic Booking System.
 
 """
+from code_clinic_io import code_clinic_output
 import code_clinic_config
 from code_clinic_authentication import code_clinic_token
 
@@ -23,11 +24,7 @@ def command_handler(command_arg):
 
 
 def help_command():
-    """Contains a list of valid commands.
     """
-
-    return """Here is a list of valid commands:
-> login - Enables the user to login to the system
-> student_calendar - Allows the user to view their student calendar
-> volunteer_calendar - Allows the user to view the code clinic calendar 
-"""
+    Contains a list of valid commands.
+    """
+    code_clinic_output.display_help()
