@@ -2,6 +2,8 @@
 Commands for the WTC Code Clinic Booking System.
 
 """
+from google.auth import credentials
+
 from code_clinic_io import code_clinic_output
 import code_clinic_config
 from code_clinic_authentication import code_clinic_token
@@ -11,20 +13,35 @@ import datetime
 
 def login():
     user_name = code_clinic_config.get_username()
-    token = code_clinic_token.get_user_token(user_name)
+    user_token = code_clinic_token.get_user_token(user_name)
+    code_clinic_token.get_clinic_token()
     code_clinic_output.login_results()
-    return token
+    return user_token
 
 
 def command_handler(command_arg):
     """It handles commands from the command line arguments.
     """
-    if command_arg == 'login':
+    if command_arg in {'-h', 'help', '--help'}:
+        help_command()
+        return
+    elif command_arg == 'login':
         login()
-    elif command_arg == 'student_calendar':
-        pass
+        return
+    elif code_clinic_token.check_user_token_expired():
+        code_clinic_output.output_token_expired()
+        return
+
+    user_credentials: credentials.Credentials = \
+        code_clinic_token.return_user_token_creds()
+
+    clinic_credentials: credentials.Credentials = \
+        code_clinic_token.return_clinic_credentials()
+
+    if command_arg == 'student_calendar':
+        display_calendar(user_credentials)
     elif command_arg == 'clinic_calendar':
-        pass
+        display_calendar(clinic_credentials)
 
 
 def help_command():
@@ -52,4 +69,7 @@ def display_calendar(token_creds):
 
     for event in events:
         start = event['start'].get('dateTime', event['start'].get('date'))
-        print(start, event['summary'])
+        start_time: str = \
+            datetime.datetime.fromisoformat(start)\
+                .strftime('%a %d-%b-%Y (%H:%M %p)')
+        print(start_time, event['summary'])
