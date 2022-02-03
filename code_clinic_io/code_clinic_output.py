@@ -26,7 +26,7 @@ def display_help():
     print("""Here is a list of valid commands:
 > login - Enables the user to login to the system
 > student_calendar - Allows the user to view their student calendar
-> volunteer_calendar - Allows the user to view the code clinic calendar 
+> clinic_calendar - Allows the user to view the code clinic calendar 
 """)
 
 
