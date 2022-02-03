@@ -35,7 +35,7 @@ def update_config(email):
     Updates the config file in the user's home directory'
     """
 
-    config_dict = {'email': email}
+    config_dict = {'username': email}
 
     with open(get_path_to_config_file(), 'w') as file_object:
         json.dump(config_dict, file_object)
@@ -71,7 +71,10 @@ def create_config_file():
 
 
 def get_username():
+    """
+    Returns the username from the config file
+    """
 
     with open(get_path_to_config_file(), 'r') as config:
         config_data = json.load(config)
-        return config_data['email']
+        return config_data['username']
