@@ -33,3 +33,11 @@ def display_help():
 def login_prompt(username):
 
     print(f'{username}: Please login')
+
+
+def output_token_expired() -> None:
+    """
+    Prints out a token expiration message for the user
+    :return: None
+    """
+    print('\nToken expired.\n\nPlease login using\n\n    code-clinic login\n')
