@@ -36,7 +36,7 @@ def get_calendar_events(calendar_data):
     calendar_events = calendar_data.get('items', [])
     for calendar_event in calendar_events:
         helpers.format_calendar_event(calendar_event)
-    return calendar_event
+    return calendar_events
 
 def format_calendar_events(calendar_events):
     '''

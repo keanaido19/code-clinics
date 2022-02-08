@@ -3,6 +3,9 @@ Output functions for Code Clinic Booking System
 
 """
 
+import helpers
+import tabulate
+
 def welcome_msg():
     """It displays a welcome message to the user.
     """
@@ -41,3 +44,32 @@ def output_token_expired() -> None:
     :return: None
     """
     print('\nToken expired.\n\nPlease login using\n\n    code-clinic login\n')
+
+
+def output_no_events_found() -> None:
+    """
+    Prints out a no calendar events found message
+    :return: None
+    """
+    print('There are currently no upcoming events.')
+
+
+def output_calendar(calendar_event_data: dict[str, list[dict]]) -> None:
+    """
+    Prints out calendar events to the user in the form of a table
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: None
+    """
+    if not calendar_event_data:
+        output_no_events_found()
+        return
+
+    output_table: list[list[str, str, str]] = \
+        helpers.format_calendar_events_to_table(calendar_event_data)
+
+    print(
+        tabulate.tabulate(
+            output_table,
+            headers=['Date', 'Time', 'Event Summary'],
+            tablefmt='fancy_grid')
+    )
