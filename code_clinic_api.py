@@ -3,7 +3,6 @@ Google calendar API calls.
 
 """
 
-from optparse import Values
 from googleapiclient.discovery import build
 import helpers
 import itertools
