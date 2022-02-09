@@ -2,7 +2,6 @@
 Additional functions to assist other modules.
 """
 
-from asyncio import events
 import datetime
 from pytz import timezone
 
@@ -16,16 +15,18 @@ def get_new_utc_date(days):
     """
     Returns current utc date plus number of specified days
     """
-
-    return get_current_utc_date() + datetime.timedelta(days=days)
+    new_date = get_current_utc_date().date() + datetime.timedelta(days=days+1)
+    new_time = datetime.datetime.min.time()
+    new_datetime = datetime.datetime.combine(new_date, new_time)
+    return new_datetime
 
 def get_date_range(days):
     """
-    Returns a range of how many days will be displayed in the calendar 
+    Returns a range of how many days will be displayed in the calendar
     """
     start_date = get_current_utc_date().isoformat() + 'Z'
     end_date = get_new_utc_date(days).isoformat() + 'Z'
-    return start_date,end_date
+    return start_date, end_date
 
 def convert_to_local_timezone(date):
     '''
@@ -100,8 +101,8 @@ def format_calendar_events_to_table(
         -> list[list[str, str, str]]:
     """
     Converts the calendar event data into a printable table format
-    :param calendar_event_data:
-    :return:
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: None
     """
     output_table: list[list[str, str, str]] = []
     table_row: list[str, str, str]
@@ -125,7 +126,8 @@ def get_available_volunteer_slots(calendar_event_data):
     for date, events in calendar_event_data.items():
         for event in events:
             if not check_volunteer_slot_booked(event):
-                available_slots[str(indexing)] = get_volunteer_slot_information(event)
+                available_slots[str(indexing)] = \
+                    get_volunteer_slot_information(event)
                 indexing += 1
     return available_slots
 
@@ -143,11 +145,59 @@ def check_volunteer_slot_booked(calendar_event):
 
 
 def get_volunteer_slot_information(calendar_event):
-    """It gets information about a volunteer slot. Returns volunteer_slot_info[dict].
-
+    """It gets information about a volunteer slot.
+    Returns volunteer_slot_info[dict]
     """
     volunteer_slot_info = {}
     volunteer_slot_info['event_id'] = calendar_event['id']
-    volunteer_slot_info['datetime'] = calendar_event['start']['event_date'] + ' (' + calendar_event['start']['event_time'] + ' - ' + calendar_event['end']['event_time'] + ')'
+    volunteer_slot_info['datetime'] = \
+        calendar_event['start']['event_date'] + \
+        ' (' + calendar_event['start']['event_time'] + \
+        ' - ' + calendar_event['end']['event_time'] + ')'
 
     return volunteer_slot_info
+
+
+def get_volunteer_slot_table_row_index(calendar_event: dict) -> int:
+    """
+    Returns the volunteer slot table row index for the given calendar event time
+    :param dict calendar_event: Calendar event
+    :return: Volunteer slot table row index
+    """
+    dt = datetime.time
+    time_key: datetime.time = get_calendar_event_start(calendar_event).time()
+    table_row_index_dict: dict[datetime.time, int] = \
+        {
+            dt(9, 0): 1, dt(9, 30): 2, dt(10, 0): 3, dt(10, 30): 4,
+            dt(11, 0): 5, dt(11, 30): 6, dt(12, 0): 7, dt(12, 30): 8,
+            dt(13, 0): 9, dt(13, 30): 10, dt(14, 0): 11, dt(14, 30): 12,
+            dt(15, 0): 13, dt(15, 30): 14, dt(16, 0): 15, dt(16, 30): 16,
+            dt(17, 0): 17, dt(17, 30): 18
+        }
+    return table_row_index_dict[time_key]
+
+
+def format_clinic_time_slots_to_table(
+        calendar_event_data: dict[str, list[dict]]) \
+        -> list[list[str, str, str]]:
+    """
+    Converts the clinic calendar time slots into a printable table format
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: None
+    """
+    output_table: list[list[str, str, str]] = []
+    table_row: list[str, str, str]
+    table_row_index: int
+    index: int = 1
+
+    for date, events in calendar_event_data.items():
+        table_row = [date] + ['-'] * 18
+        for event in events:
+            table_row_index = get_volunteer_slot_table_row_index(event)
+            if check_volunteer_slot_booked(event):
+                table_row[table_row_index] = 'BOOKED'
+            else:
+                table_row[table_row_index] = f'({index})'
+                index += 1
+        output_table.append(table_row)
+    return output_table
