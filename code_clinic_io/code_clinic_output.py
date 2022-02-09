@@ -73,3 +73,34 @@ def output_calendar(calendar_event_data: dict[str, list[dict]]) -> None:
             headers=['Date', 'Time', 'Event Summary'],
             tablefmt='fancy_grid')
     )
+
+
+def output_volunteer_slots(clinic_calendar_event_data: dict[str, list[dict]]) \
+        -> None:
+    """
+    Prints out the clinic calendar time slots in the form of a table
+    :param dict[str, list[dict]] clinic_calendar_event_data: Clinic calendar
+    event data
+    :return: None
+    """
+    output_table: list[list[str, str, str]] = \
+        helpers.format_clinic_time_slots_to_table(clinic_calendar_event_data)
+
+    headers: list[str, ...] = ['Date\\Time',
+                               '09:00AM', '09:30AM',
+                               '10:00AM', '10:30AM',
+                               '11:00AM', '11:30PM',
+                               '12:00PM', '12:30PM',
+                               '13:00PM', '13:30PM',
+                               '14:00PM', '14:30PM',
+                               '15:00PM', '15:30PM',
+                               '16:00PM', '16:30PM',
+                               '17:00PM', '17:30PM']
+
+    print(
+        tabulate.tabulate(
+            output_table,
+            headers=headers,
+            stralign='center',
+            tablefmt='fancy_grid')
+    )
