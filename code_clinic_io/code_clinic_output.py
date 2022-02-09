@@ -86,16 +86,11 @@ def output_volunteer_slots(clinic_calendar_event_data: dict[str, list[dict]]) \
     output_table: list[list[str, str, str]] = \
         helpers.format_clinic_time_slots_to_table(clinic_calendar_event_data)
 
-    headers: list[str, ...] = ['Date\\Time',
-                               '09:00AM', '09:30AM',
-                               '10:00AM', '10:30AM',
-                               '11:00AM', '11:30PM',
-                               '12:00PM', '12:30PM',
-                               '13:00PM', '13:30PM',
-                               '14:00PM', '14:30PM',
-                               '15:00PM', '15:30PM',
-                               '16:00PM', '16:30PM',
-                               '17:00PM', '17:30PM']
+    headers: list[str] = \
+        ['Date\\Time', '09:00AM', '09:30AM', '10:00AM', '10:30AM',
+         '11:00AM', '11:30PM', '12:00PM', '12:30PM', '13:00PM', '13:30PM',
+            '14:00PM', '14:30PM', '15:00PM', '15:30PM', '16:00PM', '16:30PM',
+         '17:00PM', '17:30PM']
 
     print(
         tabulate.tabulate(
@@ -104,3 +99,22 @@ def output_volunteer_slots(clinic_calendar_event_data: dict[str, list[dict]]) \
             stralign='center',
             tablefmt='fancy_grid')
     )
+
+
+def output_volunteer_booking_slot_invalid() -> None:
+    """
+    Prints out an invalid volunteer booking slot message for the user
+    :return: None
+    """
+    print("The time slot you wish to book as a volunteer is not available, "
+          ", please refer to the available time slots using 'code-clinic "
+          "volunteer_slots'.")
+
+
+def output_booking_successful(time_slot: str) -> None:
+    """
+    Prints out a booking successful message to the user
+    :param str time_slot: Specified time slot to book
+    :return: Boolean value
+    """
+    print(f'\nCode Clinic time slot - {time_slot} - successfully booked!\n')
