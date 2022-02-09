@@ -107,7 +107,7 @@ def read_clinic_calendar_file():
     """
 
     try:
-        with open(get_path_to_user_calendar_file(), 'r') as calendar_data:
+        with open(get_path_to_clinic_calendar_file(), 'r') as calendar_data:
             return json.load(calendar_data)
 
     except (FileNotFoundError, ValueError):
@@ -125,7 +125,7 @@ def update_user_calendar_file(calendar_event_data):
             json.dump(calendar_event_data, calendar_data, indent=4)
 
 
-def update_clinic_calendar(calendar_event_data):
+def update_clinic_calendar_file(calendar_event_data):
     """
     Updates the clinic calendar data file
     """
