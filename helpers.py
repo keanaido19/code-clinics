@@ -3,7 +3,9 @@ Additional functions to assist other modules.
 """
 
 import datetime
+
 from pytz import timezone
+
 
 def get_current_utc_date():
     """
@@ -11,14 +13,16 @@ def get_current_utc_date():
     """
     return datetime.datetime.utcnow()
 
+
 def get_new_utc_date(days):
     """
     Returns current utc date plus number of specified days
     """
-    new_date = get_current_utc_date().date() + datetime.timedelta(days=days+1)
+    new_date = get_current_utc_date().date() + datetime.timedelta(days=days + 1)
     new_time = datetime.datetime.min.time()
     new_datetime = datetime.datetime.combine(new_date, new_time)
     return new_datetime
+
 
 def get_date_range(days):
     """
@@ -28,29 +32,37 @@ def get_date_range(days):
     end_date = get_new_utc_date(days).isoformat() + 'Z'
     return start_date, end_date
 
+
 def convert_to_local_timezone(date):
     '''
     Converts date to local timezone
     '''
     timestamp = date.timestamp()
     utc_date = datetime.datetime.utcfromtimestamp(timestamp)
-    return timezone('UTC').localize(utc_date).astimezone(timezone('Africa/Johannesburg'))
+    return timezone('UTC').localize(utc_date).astimezone(
+        timezone('Africa/Johannesburg'))
+
 
 def get_calendar_event_start(calendar_event):
     '''
     Get the calendar event start date
     '''
     dt = datetime.datetime
-    start_time = calendar_event['start'].get('dateTime', calendar_event['start'].get('date'))
+    start_time = calendar_event['start'].get('dateTime',
+                                             calendar_event['start'].get(
+                                                 'date'))
     return convert_to_local_timezone(dt.fromisoformat(start_time))
+
 
 def get_calendar_event_end(calendar_event):
     '''
     Get the calendar event start date
     '''
     dt = datetime.datetime
-    end_time = calendar_event['end'].get('dateTime', calendar_event['end'].get('date'))
+    end_time = calendar_event['end'].get('dateTime',
+                                         calendar_event['end'].get('date'))
     return convert_to_local_timezone(dt.fromisoformat(end_time))
+
 
 def format_calendar_event_start(calendar_event):
     '''
@@ -60,6 +72,7 @@ def format_calendar_event_start(calendar_event):
     calendar_event['start']['event_date'] = event_start.strftime('%a %d-%b-%Y')
     calendar_event['start']['event_time'] = event_start.strftime('%H:%M')
 
+
 def format_calendar_event_end(calendar_event):
     '''
     formats the  calendar event start date
@@ -67,6 +80,7 @@ def format_calendar_event_end(calendar_event):
     event_end = get_calendar_event_end(calendar_event)
     calendar_event['end']['event_date'] = event_end.strftime('%a %d-%b-%Y')
     calendar_event['end']['event_time'] = event_end.strftime('%H:%M %p')
+
 
 def format_calendar_event(calendar_event):
     '''
@@ -98,14 +112,14 @@ def get_event_summary(calendar_event: dict) -> str:
 
 def format_calendar_events_to_table(
         calendar_event_data: dict[str, list[dict]]) \
-        -> list[list[str, str, str]]:
+        -> list[list[str]]:
     """
     Converts the calendar event data into a printable table format
     :param dict[str, list[dict]] calendar_event_data: Calendar event data
     :return: None
     """
-    output_table: list[list[str, str, str]] = []
-    table_row: list[str, str, str]
+    output_table: list[list[str]] = []
+    table_row: list[str]
 
     for date, events in calendar_event_data.items():
         for event in events:
@@ -216,3 +230,95 @@ def check_dictionary_key_is_valid(
         return True
     except KeyError:
         return False
+
+
+def get_event_volunteer_email(calendar_event: dict) -> str:
+    """
+    Returns the volunteer's email address from the calendar event
+    :param dict calendar_event: Calendar event
+    :return: Volunteer's email address
+    """
+    return calendar_event['attendees'][0]['email']
+
+
+def check_slot_booked_by_volunteer(username: str, calendar_event: dict) -> bool:
+    """
+    Checks if the calendar event has only been booked by a volunteer
+    :param str username: Current user's username
+    :param dict calendar_event: Calendar event
+    :return: Boolean value
+    """
+    try:
+        if calendar_event['summary'] == 'Code Clinic':
+            attendees: list[dict[str, str]] = calendar_event['attendees']
+            if len(attendees) == 1:
+                return get_event_volunteer_email(calendar_event) != username \
+                    and attendees[0]['comment'] == 'Volunteer'
+        return False
+    except KeyError:
+        return False
+
+
+def get_time_slot_information(calendar_event: dict) -> dict[str, str]:
+    """
+    Returns information about the calendar event's time slot
+    :param dict calendar_event: Calendar event
+    :return: Calendar event time slot information
+    """
+    return \
+        {
+            'event_id': calendar_event['id'],
+            'datetime': calendar_event['start']['event_date'] + ' (' +
+            calendar_event['start']['event_date'] + ' (' +
+            calendar_event['start']['event_time'] + ' - ' +
+            calendar_event['end']['event_time'] + ')'
+        }
+
+
+def get_available_student_slots(
+        username: str,
+        calendar_event_data: dict[str, list[dict]]) \
+        -> dict[str, dict[str, str]]:
+    """
+    Returns a dictionary of available student slots that can be booked
+    :param str username: Current user's username
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: Available student slots that can be booked
+    """
+    available_slots: dict[str, dict[str, str]] = {}
+    index: int = 1
+
+    for date, events in calendar_event_data.items():
+        for event in events:
+            if check_slot_booked_by_volunteer(username, event):
+                available_slots[str(index)] = \
+                    get_time_slot_information(event)
+                index += 1
+    return available_slots
+
+
+def format_calendar_events_to_available_student_bookings(
+        username: str,
+        calendar_event_data: dict[str, list[dict]]) \
+        -> list[list[str]]:
+    """
+    Extracts the available student bookings from the calendar event data and
+    converts it into a table format
+    :param str username: Current user's username
+    :param calendar_event_data:
+    :return:
+    """
+    output_table: list[list[str]] = []
+    table_row: list[str]
+    table_row_index: int
+    index: int = 1
+
+    for date, events in calendar_event_data.items():
+        for event in events:
+            if check_slot_booked_by_volunteer(username, event):
+                table_row = \
+                    [f'({index})', date, get_event_time_period(event),
+                     get_event_summary(event), get_event_volunteer_email(event)]
+                output_table.append(table_row)
+                index += 1
+    return output_table
