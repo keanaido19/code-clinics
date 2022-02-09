@@ -201,3 +201,18 @@ def format_clinic_time_slots_to_table(
                 index += 1
         output_table.append(table_row)
     return output_table
+
+
+def check_dictionary_key_is_valid(
+        key: str, dictionary: dict) -> bool:
+    """
+    Checks if the dictionary key exists in the dictionary
+    :param str key: Dictionary key
+    :param dict dictionary: Dictionary
+    :return: Boolean value
+    """
+    try:
+        dictionary[key]
+        return True
+    except KeyError:
+        return False
