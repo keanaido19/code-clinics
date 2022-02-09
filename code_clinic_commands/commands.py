@@ -9,6 +9,7 @@ import code_clinic_calendar_files
 import code_clinic_config
 from code_clinic_authentication import code_clinic_token
 from code_clinic_io import code_clinic_output
+import helpers
 
 
 def login():
@@ -87,3 +88,11 @@ def command_handler(command_arg):
         display_calendar(user_credentials, 'user')
     elif command_arg == 'clinic_calendar':
         display_calendar(clinic_credentials, 'clinic')
+    elif command_arg == 'volunteer_slots':
+        display_volunteer_slots(clinic_credentials)
+
+
+def display_volunteer_slots(clinic_credentials):
+    update_local_calendar(clinic_credentials, 'clinic')
+    clinic_calendar_event_data = code_clinic_calendar_files.read_clinic_calendar_file()
+    helpers.get_available_volunteer_slots(clinic_calendar_event_data)

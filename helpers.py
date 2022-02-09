@@ -2,6 +2,7 @@
 Additional functions to assist other modules.
 """
 
+from asyncio import events
 import datetime
 from pytz import timezone
 
@@ -112,3 +113,41 @@ def format_calendar_events_to_table(
             output_table.append(table_row)
 
     return output_table
+
+
+def get_available_volunteer_slots(calendar_event_data):
+    """Checks for available volunteer slots. Returns available_slots[dict]
+
+    """
+    available_slots = {}
+    indexing = 1
+
+    for date, events in calendar_event_data.items():
+        for event in events:
+            if not check_volunteer_slot_booked(event):
+                available_slots[str(indexing)] = get_volunteer_slot_information(event)
+                indexing += 1
+    return available_slots
+
+
+def check_volunteer_slot_booked(calendar_event):
+    """Checks if a slot is booked. Returns[bool]
+
+    """
+    try:
+        if calendar_event['summary'] == 'Code Clinic':
+            return len(calendar_event['attendees']) > 0
+        return False
+    except KeyError:
+        return False
+
+
+def get_volunteer_slot_information(calendar_event):
+    """It gets information about a volunteer slot. Returns volunteer_slot_info[dict].
+
+    """
+    volunteer_slot_info = {}
+    volunteer_slot_info['event_id'] = calendar_event['id']
+    volunteer_slot_info['datetime'] = calendar_event['start']['event_date'] + ' (' + calendar_event['start']['event_time'] + ' - ' + calendar_event['end']['event_time'] + ')'
+
+    return volunteer_slot_info
