@@ -64,13 +64,14 @@ def output_calendar(calendar_event_data: dict[str, list[dict]]) -> None:
         output_no_events_found()
         return
 
-    output_table: list[list[str, str, str]] = \
+    output_table: list[list[str]] = \
         helpers.format_calendar_events_to_table(calendar_event_data)
 
     print(
         tabulate.tabulate(
             output_table,
             headers=['Date', 'Time', 'Event Summary'],
+            stralign='center',
             tablefmt='fancy_grid')
     )
 
@@ -118,3 +119,39 @@ def output_booking_successful(time_slot: str) -> None:
     :return: Boolean value
     """
     print(f'\nCode Clinic time slot - {time_slot} - successfully booked!\n')
+
+
+def output_no_available_student_bookings() -> None:
+    """
+    Prints out a no available student bookings message to the user
+    :return: None
+    """
+    print('There are currently no Code Clinic time slots that you can book '
+          'as a student.')
+
+
+def output_student_slots(
+        username: str,
+        calendar_event_data: dict[str, list[dict]]) \
+        -> None:
+    """
+    Prints out the available student booking slots as a table
+    :param str username: Current user's username
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: None
+    """
+    output_table: list[list[str]] = \
+        helpers.format_calendar_events_to_available_student_bookings(
+        username, calendar_event_data)
+
+    if not output_table:
+        output_no_available_student_bookings()
+        return
+
+    print(
+        tabulate.tabulate(
+            output_table,
+            headers=['Index', 'Date', 'Time', 'Event Summary', 'Volunteer'],
+            stralign='center',
+            tablefmt='fancy_grid')
+    )
