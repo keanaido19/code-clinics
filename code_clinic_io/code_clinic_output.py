@@ -156,3 +156,38 @@ def output_student_slots(
             stralign='center',
             tablefmt='fancy_grid')
     )
+
+
+def output_no_available_user_book_volunteer_slots() -> None:
+    """
+    Prints out a no available student bookings message to the user
+    :return: None
+    """
+    print('There are currently no Code Clinic time slots that you '
+          'have booked as a volunteer.')
+
+
+def output_user_booked_volunteer_slots(
+        username: str,
+        calendar_event_data: dict[str, list[dict]]) -> None:
+    """
+    Prints out the user's booked volunteer slots as a table
+    :param str username: The user's username
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: None
+    """
+    output_table: list[list[str]] = \
+        helpers.format_user_booked_volunteer_slots_to_table(
+            calendar_event_data, username)
+
+    if not output_table:
+        output_no_available_user_book_volunteer_slots()
+        return
+
+    print(
+        tabulate.tabulate(
+            output_table,
+            headers=['Index', 'Date', 'Time', 'Student'],
+            stralign='center',
+            tablefmt='fancy_grid')
+    )
