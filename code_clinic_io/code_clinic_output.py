@@ -2,9 +2,10 @@
 Output functions for Code Clinic Booking System
 
 """
-
+from __future__ import annotations
 import helpers
 import tabulate
+
 
 def welcome_msg():
     """It displays a welcome message to the user.

@@ -30,12 +30,12 @@ def get_path_to_config_file():
     return os.path.join(os.environ["HOME"], 'code-clinic/config.json')
 
 
-def update_config(email):
+def update_config(email, location):
     """
     Updates the config file in the user's home directory'
     """
 
-    config_dict = {'username': email}
+    config_dict = {'username': email, 'campus': location}
 
     with open(get_path_to_config_file(), 'w') as file_object:
         json.dump(config_dict, file_object)

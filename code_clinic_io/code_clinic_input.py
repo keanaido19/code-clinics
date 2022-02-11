@@ -31,3 +31,11 @@ def input_confirm_time_slot(time_slot: str, user_type: str) \
     """
     return input(f'Confirm {user_type} booking for Code Clinic time slot : '
                  f'{time_slot}? (yes\\no)\n').lower().strip() in {'yes', 'y'}
+
+
+def get_location():
+    """
+    Prompts the user to enter their campus location
+    """
+
+    return input('Please enter your campus location (DBN\\JHB\\CPT): ')

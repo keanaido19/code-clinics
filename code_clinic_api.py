@@ -2,12 +2,15 @@
 Google calendar API calls.
 
 """
+from __future__ import annotations
+
 from googleapiclient import discovery
 from googleapiclient.discovery import build
 import helpers
 import itertools
 from google.auth import credentials
 import code_clinic_config
+
 
 
 def build_calendar_service(token_creds):
@@ -22,12 +25,12 @@ def get_calendar_data(calendar_service):
     """
     get the calendar data for a given number of days
     """
-    
+
     now, end = helpers.get_date_range(7)
-    
+
     return calendar_service.events().list(
-        calendarId='primary', 
-        timeMin=now, 
+        calendarId='primary',
+        timeMin=now,
         timeMax=end,
         singleEvents=True,
         orderBy='startTime').execute()
