@@ -242,7 +242,20 @@ def get_event_volunteer_email(calendar_event: dict) -> str:
     return calendar_event['attendees'][0]['email']
 
 
-def check_slot_booked_by_volunteer(username: str, calendar_event: dict) -> bool:
+def get_event_student_email(calendar_event: dict) -> str:
+    """
+    Returns the student's email address from the calendar event
+    :param dict calendar_event: Calendar event
+    :return: Student's email address
+    """
+    try:
+        return calendar_event['attendees'][1]['email']
+    except IndexError:
+        return '-'
+
+
+def check_student_slot_booked_by_volunteer_only(
+        username: str, calendar_event: dict) -> bool:
     """
     Checks if the calendar event has only been booked by a volunteer
     :param str username: Current user's username
@@ -254,6 +267,44 @@ def check_slot_booked_by_volunteer(username: str, calendar_event: dict) -> bool:
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if len(attendees) == 1:
                 return get_event_volunteer_email(calendar_event) != username \
+                    and attendees[0]['comment'] == 'Volunteer'
+        return False
+    except KeyError:
+        return False
+
+
+def check_volunteer_slot_booked_by_user_only(
+        username: str, calendar_event: dict) -> bool:
+    """
+    Checks if the calendar event has only been booked by the user as a volunteer
+    :param str username: Current user's username
+    :param dict calendar_event: Calendar event
+    :return: Boolean value
+    """
+    try:
+        if calendar_event['summary'] == 'Code Clinic':
+            attendees: list[dict[str, str]] = calendar_event['attendees']
+            if len(attendees) == 1:
+                return get_event_volunteer_email(calendar_event) == username \
+                    and attendees[0]['comment'] == 'Volunteer'
+        return False
+    except KeyError:
+        return False
+
+
+def check_volunteer_slot_booked_by_user(
+        username: str, calendar_event: dict) -> bool:
+    """
+    Checks if the calendar event has only been booked by the user as a volunteer
+    :param str username: Current user's username
+    :param dict calendar_event: Calendar event
+    :return: Boolean value
+    """
+    try:
+        if calendar_event['summary'] == 'Code Clinic':
+            attendees: list[dict[str, str]] = calendar_event['attendees']
+            if attendees:
+                return get_event_volunteer_email(calendar_event) == username \
                     and attendees[0]['comment'] == 'Volunteer'
         return False
     except KeyError:
@@ -291,7 +342,7 @@ def get_available_student_slots(
 
     for date, events in calendar_event_data.items():
         for event in events:
-            if check_slot_booked_by_volunteer(username, event):
+            if check_student_slot_booked_by_volunteer_only(username, event):
                 available_slots[str(index)] = \
                     get_time_slot_information(event)
                 index += 1
@@ -316,7 +367,7 @@ def format_calendar_events_to_available_student_bookings(
 
     for date, events in calendar_event_data.items():
         for event in events:
-            if check_slot_booked_by_volunteer(username, event):
+            if check_student_slot_booked_by_volunteer_only(username, event):
                 table_row = \
                     [f'({index})', date, get_event_time_period(event),
                      get_event_summary(event), get_event_volunteer_email(event)]
@@ -325,30 +376,52 @@ def format_calendar_events_to_available_student_bookings(
     return output_table
 
 
-def get_user_booked_volunteer_slots():
-    pass
-
-
-def check_volunteer_slot_retractable(calendar_event, username):
-
-    try:
-        attendees = calendar_event['attendees']
-        if len(attendees) == 1:
-            return attendees[0]['email'] == username and attendees[0]['comment'] == 'Volunteer'
-
-    except KeyError:
-        return False
-
-def get_retractable_volunteer_slots(calendar_event_data,username):
-
-    retractable_volunteer_slots ={}
+def get_retractable_volunteer_slots(
+        calendar_event_data: dict[str, list[dict]],
+        username: str) -> dict[str, dict[str, str]]:
+    """
+    Retrieves the user's booked volunteer slots that can be cancelled
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :param str username: The current user's username
+    :return: User's booked volunteer slots that can be cancelled
+    """
+    retractable_volunteer_slots = {}
     indexing = 1
 
     for date, events in calendar_event_data.items():
         for event in events:
-            if check_volunteer_slot_retractable(event,username):
+            if check_volunteer_slot_booked_by_user_only(username, event):
                 retractable_volunteer_slots[str(indexing)] = \
                     get_volunteer_slot_information(event)
                 indexing += 1
     return retractable_volunteer_slots
 
+
+def format_user_booked_volunteer_slots_to_table(
+        calendar_event_data: dict[str, list[dict]], username: str) \
+        -> list[list[str]]:
+    """
+    Extracts the user's booked volunteer slots from their calendar even data
+    and converts it into table format
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :param str username: The current user's username
+    :return: User's booked volunteer slots as table format
+    """
+    output_table: list[list[str]] = []
+    table_row: list[str]
+    table_row_index: int
+    index: int = 0
+
+    for date, events in calendar_event_data.items():
+        for event in events:
+            if check_volunteer_slot_booked_by_user(username, event):
+                if check_volunteer_slot_booked_by_user_only(username, event):
+                    index += 1
+                    table_row = [f'({index})']
+                else:
+                    table_row = ['-']
+                table_row += [date, get_event_time_period(event),
+                              get_event_student_email(event)]
+                output_table.append(table_row)
+
+    return output_table

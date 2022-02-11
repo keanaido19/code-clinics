@@ -158,6 +158,28 @@ def display_student_slots(clinic_credentials: credentials.Credentials) -> None:
         username, clinic_calendar_event_data)
 
 
+def display_user_volunteer_slots(user_credentials: credentials.Credentials) \
+        -> None:
+    """
+    Displays the WTC Code Clinic time slots booked by the user as a volunteer
+    :param credentials.Credentials user_credentials: User token credentials
+    :return: None
+    """
+    # Updates local user calendar file if data is not up-to-date
+    update_local_calendar(user_credentials, 'user')
+
+    # Retrieves the user calendar event data from the local file
+    user_calendar_event_data: dict[str, list[dict]] = \
+        code_clinic_calendar_files.read_user_calendar_file()
+
+    # Retrieves the user's username from the config file
+    username: str = code_clinic_config.get_username()
+
+    # Outputs the user's booked volunteer slots as a table
+    code_clinic_output.output_user_booked_volunteer_slots(
+        username, user_calendar_event_data)
+
+
 def command_handler(command_arg):
     """It handles commands from the command line arguments.
     """
@@ -188,12 +210,4 @@ def command_handler(command_arg):
     elif command_arg == 'student_slots':
         display_student_slots(clinic_credentials)
     elif command_arg == 'my_volunteer_slots':
-        display_my_volunteer_slots(user_credentials)
-
-
-def display_my_volunteer_slots(user_credentials):
-    update_local_calendar(user_credentials, 'user')
-    user_calendar_event_data = code_clinic_calendar_files.read_user_calendar_file()
-    username = code_clinic_config.get_username()
-    import helpers
-    helpers.get_retractable_volunteer_slots(user_calendar_event_data, username)
+        display_user_volunteer_slots(user_credentials)
