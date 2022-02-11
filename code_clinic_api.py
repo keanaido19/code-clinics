@@ -4,13 +4,14 @@ Google calendar API calls.
 """
 from __future__ import annotations
 
+import itertools
+
+from google.auth import credentials
 from googleapiclient import discovery
 from googleapiclient.discovery import build
-import helpers
-import itertools
-from google.auth import credentials
-import code_clinic_config
 
+import code_clinic_config
+import helpers
 
 
 def build_calendar_service(token_creds):
@@ -68,31 +69,38 @@ def get_formatted_calendar_events(token_credentials):
 
 
 def book_code_clinic_time_slot(
-        token_credentials: credentials.Credentials,
+        clinic_credentials: credentials.Credentials,
         event_id: str, user_type: str) -> None:
     """
     Books the given WTC Code Clinic Booking System time slot
-    :param credentials.Credentials token_credentials: Token credentials
+    :param credentials.Credentials clinic_credentials: Clinic token credentials
     :param str event_id: Calendar event id
     :param str user_type: str user_type: Type of user, volunteer or student
     :return: None
     """
+    # Builds Google Calendar API service
     calendar_service: discovery.Resource = \
-        build_calendar_service(token_credentials)
+        build_calendar_service(clinic_credentials)
 
+    # Retrieves calendar event from Google calendar using the event's id
     calendar_event: dict = \
         calendar_service.events()\
         .get(calendarId='primary', eventId=event_id).execute()
 
+    # Retrieves the user's information from the config file
     username: str = code_clinic_config.get_username()
+    campus_location: str = code_clinic_config.get_campus_location()
 
+    # Set the events maximum allowable number of attendees
     calendar_event['maxAttendees']: int = 2
 
+    # Checks for the events attendees and adds the user to the event's
+    # attendees list
     if helpers.check_dictionary_key_is_valid('attendees', calendar_event):
         calendar_event['attendees'].append(
             {
                 'email': username,
-                'comment': user_type,
+                'comment': f'{user_type} - {campus_location}',
                 'responseStatus': 'accepted',
             }
         )
@@ -100,9 +108,38 @@ def book_code_clinic_time_slot(
         calendar_event['attendees']: list[dict[str, str]] = \
             [{
                 'email': username,
-                'comment': user_type,
+                'comment': f'{user_type} - {campus_location}',
                 'responseStatus': 'accepted',
             }]
 
+    # Updates the Google Calendar event with the new modified event with the
+    # user as an attendee
+    calendar_service.events().update(
+        calendarId='primary', eventId=event_id, body=calendar_event).execute()
+
+
+def cancel_volunteer_booking(
+        clinic_credentials: credentials.Credentials, event_id: str) -> None:
+    """
+    Cancels the user's given volunteer slot for the WTC Code Clinic Booking
+    System
+    :param credentials.Credentials clinic_credentials: Clinic token credentials
+    :param str event_id: Calendar event id
+    :return: None
+    """
+    # Builds Google Calendar API service
+    calendar_service: discovery.Resource = \
+        build_calendar_service(clinic_credentials)
+
+    # Retrieves calendar event from Google calendar using the event's id
+    calendar_event: dict = \
+        calendar_service.events()\
+        .get(calendarId='primary', eventId=event_id).execute()
+
+    # Sets the 'attendees' key from the event dictionary to an empty list
+    calendar_event['attendees'] = []
+
+    # Updates the event on Google Calendar with  the removed 'attendees'
+    # key from the event
     calendar_service.events().update(
         calendarId='primary', eventId=event_id, body=calendar_event).execute()

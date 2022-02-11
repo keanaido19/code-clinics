@@ -78,3 +78,13 @@ def get_username():
     with open(get_path_to_config_file(), 'r') as config:
         config_data = json.load(config)
         return config_data['username']
+
+
+def get_campus_location() -> str:
+    """
+    Returns the campus location from the config file
+    :return: The user's campus location
+    """
+    with open(get_path_to_config_file(), 'r') as config:
+        config_data = json.load(config)
+        return config_data['campus']

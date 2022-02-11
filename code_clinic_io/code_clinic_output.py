@@ -101,6 +101,8 @@ def output_volunteer_slots(clinic_calendar_event_data: dict[str, list[dict]]) \
             stralign='center',
             tablefmt='fancy_grid')
     )
+    print("\nAn indexed volunteer slot can be booked by using"
+          "\n\n    code-clinic book_volunteer_slot <index>\n")
 
 
 def output_volunteer_booking_slot_invalid() -> None:
@@ -109,8 +111,8 @@ def output_volunteer_booking_slot_invalid() -> None:
     :return: None
     """
     print("The time slot you wish to book as a volunteer is not available, "
-          ", please refer to the available time slots using 'code-clinic "
-          "volunteer_slots'.")
+          "please refer to the available time slots using"
+          "\n\n    code-clinic volunteer_slots\n")
 
 
 def output_booking_successful(time_slot: str) -> None:
@@ -152,10 +154,13 @@ def output_student_slots(
     print(
         tabulate.tabulate(
             output_table,
-            headers=['Index', 'Date', 'Time', 'Event Summary', 'Volunteer'],
+            headers=['Index', 'Date', 'Time', 'Campus', 'Volunteer'],
             stralign='center',
             tablefmt='fancy_grid')
     )
+
+    print("\nAn indexed student slot can be booked by using"
+          "\n\n    code-clinic book_student_slot <index>\n")
 
 
 def output_no_available_user_book_volunteer_slots() -> None:
@@ -191,3 +196,24 @@ def output_user_booked_volunteer_slots(
             stralign='center',
             tablefmt='fancy_grid')
     )
+    print("\nAn indexed volunteer booking can be canceled by using"
+          "\n\n    code-clinic cancel_volunteer_booking <index>\n")
+
+
+def output_cancel_volunteer_booking_slot_invalid() -> None:
+    """
+    Prints out an invalid cancel volunteer booking slot message for the user
+    :return: None
+    """
+    print("The time slot you wish to cancel as a volunteer has not been "
+          "booked by you, please refer to your volunteer time slots using"
+          "\n\n    code-clinic my_volunteer_slots\n")
+
+
+def output_cancel_booking_successful(time_slot: str) -> None:
+    """
+    Prints out a cancellation successful message to the user
+    :param str time_slot: Specified time slot to cancel
+    :return: Boolean value
+    """
+    print(f'\nCode Clinic time slot - {time_slot} - successfully cancelled!\n')
