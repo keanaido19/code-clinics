@@ -323,3 +323,32 @@ def format_calendar_events_to_available_student_bookings(
                 output_table.append(table_row)
                 index += 1
     return output_table
+
+
+def get_user_booked_volunteer_slots():
+    pass
+
+
+def check_volunteer_slot_retractable(calendar_event, username):
+
+    try:
+        attendees = calendar_event['attendees']
+        if len(attendees) == 1:
+            return attendees[0]['email'] == username and attendees[0]['comment'] == 'Volunteer'
+
+    except KeyError:
+        return False
+
+def get_retractable_volunteer_slots(calendar_event_data,username):
+
+    retractable_volunteer_slots ={}
+    indexing = 1
+
+    for date, events in calendar_event_data.items():
+        for event in events:
+            if check_volunteer_slot_retractable(event,username):
+                retractable_volunteer_slots[str(indexing)] = \
+                    get_volunteer_slot_information(event)
+                indexing += 1
+    return retractable_volunteer_slots
+

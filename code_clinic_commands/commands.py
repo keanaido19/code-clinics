@@ -187,3 +187,13 @@ def command_handler(command_arg):
         book_volunteer_slot(clinic_credentials, command_arg)
     elif command_arg == 'student_slots':
         display_student_slots(clinic_credentials)
+    elif command_arg == 'my_volunteer_slots':
+        display_my_volunteer_slots(user_credentials)
+
+
+def display_my_volunteer_slots(user_credentials):
+    update_local_calendar(user_credentials, 'user')
+    user_calendar_event_data = code_clinic_calendar_files.read_user_calendar_file()
+    username = code_clinic_config.get_username()
+    import helpers
+    helpers.get_retractable_volunteer_slots(user_calendar_event_data, username)
