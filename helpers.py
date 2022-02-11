@@ -2,6 +2,7 @@
 Additional functions to assist other modules.
 """
 
+from __future__ import annotations
 import datetime
 
 from pytz import timezone
