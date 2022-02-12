@@ -49,9 +49,9 @@ def get_calendar_event_start(calendar_event):
     Get the calendar event start date
     '''
     dt = datetime.datetime
-    start_time = calendar_event['start'].get('dateTime',
-                                             calendar_event['start'].get(
-                                                 'date'))
+    start_time = \
+        calendar_event['start']\
+        .get('dateTime', calendar_event['start'].get('date'))
     return convert_to_local_timezone(dt.fromisoformat(start_time))
 
 
@@ -81,6 +81,42 @@ def format_calendar_event_end(calendar_event):
     event_end = get_calendar_event_end(calendar_event)
     calendar_event['end']['event_date'] = event_end.strftime('%a %d-%b-%Y')
     calendar_event['end']['event_time'] = event_end.strftime('%H:%M %p')
+
+
+def get_current_datetime_timestamp() -> float:
+    """
+    Returns the current datetime as a timestamp float
+    :return: Current datetime as a timestamp float
+    """
+    current_datetime_as_string: str = \
+        datetime.datetime.now().isoformat() + '+02:00'
+    return \
+        datetime.datetime.fromisoformat(current_datetime_as_string).timestamp()
+
+
+def check_calendar_event_not_expired(calendar_event: dict) -> bool:
+    """
+    Checks if the given calendar event has expired
+    :param dict calendar_event: Calendar event
+    :return: Boolean value
+    """
+    current_datetime_timestamp: float = get_current_datetime_timestamp()
+    return get_calendar_event_start(
+        calendar_event).timestamp() > current_datetime_timestamp
+
+
+def remove_expired_calendar_events(calendar_events: list[dict]) -> list[dict]:
+    """
+    Removes any expired calendar events from the given list of calendar events
+    :param list[dict] calendar_events: List of calendar events from Google
+    Calendar
+    :return: List of calendar events with expired events removed
+    """
+    return [
+        calendar_event
+        for calendar_event in calendar_events
+        if check_calendar_event_not_expired(calendar_event)
+    ]
 
 
 def format_calendar_event(calendar_event):
@@ -258,12 +294,18 @@ def get_event_student_email(calendar_event: dict) -> str:
     :return: Student's email address
     """
     try:
-        return calendar_event['attendees'][1]['email']
+        return next(
+            (
+                attendee['email']
+                for attendee in calendar_event['attendees']
+                if 'Student' in attendee['comment']
+            ), '-')
+
     except IndexError:
         return '-'
 
 
-def check_student_slot_booked_by_volunteer_only(
+def check_code_clinic_slot_booked_by_volunteer_only(
         username: str, calendar_event: dict) -> bool:
     """
     Checks if the calendar event has only been booked by a volunteer
@@ -282,7 +324,7 @@ def check_student_slot_booked_by_volunteer_only(
         return False
 
 
-def check_volunteer_slot_booked_by_user_only(
+def check_code_clinic_slot_booked_by_user_as_volunteer_only(
         username: str, calendar_event: dict) -> bool:
     """
     Checks if the calendar event has only been booked by the user as a volunteer
@@ -301,10 +343,10 @@ def check_volunteer_slot_booked_by_user_only(
         return False
 
 
-def check_volunteer_slot_booked_by_user(
+def check_code_clinic_slot_booked_by_user_as_volunteer(
         username: str, calendar_event: dict) -> bool:
     """
-    Checks if the calendar event has only been booked by the user as a volunteer
+    Checks if the calendar event has been booked by the user as a volunteer
     :param str username: Current user's username
     :param dict calendar_event: Calendar event
     :return: Boolean value
@@ -313,8 +355,8 @@ def check_volunteer_slot_booked_by_user(
         if calendar_event['summary'] == 'Code Clinic':
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if attendees:
-                return get_event_volunteer_email(calendar_event) == username \
-                    and 'Volunteer' in attendees[0]['comment']
+                return any(username == attendee['email'] and 'Volunteer' in
+                           attendee['comment'] for attendee in attendees)
         return False
     except KeyError:
         return False
@@ -350,11 +392,55 @@ def get_available_student_slots(
 
     for date, events in calendar_event_data.items():
         for event in events:
-            if check_student_slot_booked_by_volunteer_only(username, event):
+            if check_code_clinic_slot_booked_by_volunteer_only(username, event):
                 available_slots[str(index)] = \
                     get_time_slot_information(event)
             index += 1
     return available_slots
+
+
+def check_code_clinic_time_slot_booked_by_user_as_student(
+        username: str, calendar_event: dict) -> bool:
+    """
+    Checks if the calendar event has been booked by the user as a student
+    :param str username: Current user's username
+    :param dict calendar_event: Calendar event
+    :return: Boolean value
+    """
+    try:
+        if calendar_event['summary'] == 'Code Clinic':
+            attendees: list[dict[str, str]] = calendar_event['attendees']
+            if len(attendees) == 2:
+                return any(
+                    username == attendee['email'] and 'Student' in
+                    attendee['comment'] for attendee in attendees
+                )
+        return False
+    except KeyError:
+        return False
+
+
+def get_user_booked_student_slots(
+        username: str,
+        calendar_event_data: dict[str, list[dict]]) \
+        -> dict[str, dict[str, str]]:
+    """
+    Returns a dictionary of student slots that have booked by the user
+    :param str username: The current user's username
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: Dictionary of student slots that have booked by the user
+    """
+    user_booked_student_slots: dict[str, dict[str, str]] = {}
+    index: int = 1
+
+    for date, events in calendar_event_data.items():
+        for event in events:
+            if check_code_clinic_time_slot_booked_by_user_as_student(
+                    username, event):
+                user_booked_student_slots[str(index)] = \
+                    get_time_slot_information(event)
+            index += 1
+    return user_booked_student_slots
 
 
 def format_calendar_events_to_available_student_bookings(
@@ -365,8 +451,8 @@ def format_calendar_events_to_available_student_bookings(
     Extracts the available student bookings from the calendar event data and
     converts it into a table format
     :param str username: Current user's username
-    :param calendar_event_data:
-    :return:
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :return: Available student bookings in table format
     """
     output_table: list[list[str]] = []
     table_row: list[str]
@@ -375,7 +461,7 @@ def format_calendar_events_to_available_student_bookings(
 
     for date, events in calendar_event_data.items():
         for event in events:
-            if check_student_slot_booked_by_volunteer_only(username, event):
+            if check_code_clinic_slot_booked_by_volunteer_only(username, event):
                 table_row = \
                     [f'({index})', date, get_event_time_period(event),
                      get_event_volunteer_location(event),
@@ -386,12 +472,13 @@ def format_calendar_events_to_available_student_bookings(
 
 
 def get_retractable_volunteer_slots(
-        calendar_event_data: dict[str, list[dict]],
-        username: str) -> dict[str, dict[str, str]]:
+        username: str,
+        calendar_event_data: dict[str, list[dict]]) \
+        -> dict[str, dict[str, str]]:
     """
     Retrieves the user's booked volunteer slots that can be cancelled
-    :param dict[str, list[dict]] calendar_event_data: Calendar event data
     :param str username: The current user's username
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
     :return: User's booked volunteer slots that can be cancelled
     """
     retractable_volunteer_slots = {}
@@ -399,7 +486,8 @@ def get_retractable_volunteer_slots(
 
     for date, events in calendar_event_data.items():
         for event in events:
-            if check_volunteer_slot_booked_by_user_only(username, event):
+            if check_code_clinic_slot_booked_by_user_as_volunteer_only(
+                    username, event):
                 retractable_volunteer_slots[str(indexing)] = \
                     get_volunteer_slot_information(event)
             indexing += 1
@@ -423,8 +511,10 @@ def format_user_booked_volunteer_slots_to_table(
 
     for date, events in calendar_event_data.items():
         for event in events:
-            if check_volunteer_slot_booked_by_user(username, event):
-                if check_volunteer_slot_booked_by_user_only(username, event):
+            if check_code_clinic_slot_booked_by_user_as_volunteer(
+                    username, event):
+                if check_code_clinic_slot_booked_by_user_as_volunteer_only(
+                        username, event):
                     table_row = [f'({index})']
                 else:
                     table_row = ['-']

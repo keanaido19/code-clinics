@@ -41,7 +41,8 @@ def get_calendar_events(calendar_data):
     '''
     This Function returns the events that a in a calendar
     '''
-    calendar_events = calendar_data.get('items', [])
+    calendar_events = \
+        helpers.remove_expired_calendar_events(calendar_data.get('items', []))
     for calendar_event in calendar_events:
         helpers.format_calendar_event(calendar_event)
     return calendar_events
@@ -118,11 +119,10 @@ def book_code_clinic_time_slot(
         calendarId='primary', eventId=event_id, body=calendar_event).execute()
 
 
-def cancel_volunteer_booking(
+def cancel_booking(
         clinic_credentials: credentials.Credentials, event_id: str) -> None:
     """
-    Cancels the user's given volunteer slot for the WTC Code Clinic Booking
-    System
+    Removes the user from the Google Calendar Event
     :param credentials.Credentials clinic_credentials: Clinic token credentials
     :param str event_id: Calendar event id
     :return: None
@@ -133,13 +133,18 @@ def cancel_volunteer_booking(
 
     # Retrieves calendar event from Google calendar using the event's id
     calendar_event: dict = \
-        calendar_service.events()\
+        calendar_service.events() \
         .get(calendarId='primary', eventId=event_id).execute()
 
-    # Sets the 'attendees' key from the event dictionary to an empty list
-    calendar_event['attendees'] = []
+    # Retrieves the user's username from the config file
+    username: str = code_clinic_config.get_username()
 
-    # Updates the event on Google Calendar with  the removed 'attendees'
-    # key from the event
+    # Removes the user from the 'attendees' key of the event dictionary
+    for index, attendee in enumerate(calendar_event['attendees']):
+        if attendee['email'] == username:
+            calendar_event['attendees'].pop(index)
+
+    # Updates the event on Google Calendar with the user removed from the
+    # 'attendees' key of the event
     calendar_service.events().update(
         calendarId='primary', eventId=event_id, body=calendar_event).execute()

@@ -82,29 +82,29 @@ def display_volunteer_slots(clinic_credentials: credentials.Credentials) \
     code_clinic_output.output_volunteer_slots(clinic_calendar_event_data)
 
 
-def get_command_argument(command_arg: str) -> str:
+def get_command_argument(command: str) -> str:
     """
     Returns the command argument for the WTC Code Clinic Booking System command
-    :param str command_arg: WTC Code Clinic Booking System command
+    :param str command: WTC Code Clinic Booking System command
     :return: Command argument
     """
-    return command_arg.split(' ')[-1]
+    return command.split(' ')[-1]
 
 
 def book_volunteer_slot(clinic_credentials: credentials.Credentials,
-                        command_arg: str) -> None:
+                        command: str) -> None:
     """
     Command to allow the user to book a WTC Code Clinic Booking System time slot
     as a volunteer
     :param credentials. Credentials clinic_credentials: Clinic token credentials
-    :param str command_arg: WTC Code Clinic Booking System command
+    :param str command: WTC Code Clinic Booking System command
     :return: None
     """
     # Updates local clinic calendar file if data is not up-to-date
     update_local_calendar(clinic_credentials, 'clinic')
 
     # Retrieves the volunteer time slot index from the command
-    volunteer_slot_key: str = get_command_argument(command_arg)
+    volunteer_slot_key: str = get_command_argument(command)
 
     # Retrieves the clinic calendar event data from the local file
     clinic_calendar_event_data: dict[str, list[dict]] = \
@@ -133,6 +133,7 @@ def book_volunteer_slot(clinic_credentials: credentials.Credentials,
         code_clinic_api.book_code_clinic_time_slot(
             clinic_credentials, volunteer_slot['event_id'], 'Volunteer')
 
+        # Outputs a booking success message
         code_clinic_output.output_booking_successful(volunteer_slot['datetime'])
 
 
@@ -158,23 +159,23 @@ def display_user_volunteer_slots(clinic_credentials: credentials.Credentials) \
         username, user_calendar_event_data)
 
 
-def cancel_volunteer_slot(
+def cancel_volunteer_booking(
         clinic_credentials: credentials.Credentials,
-        command_arg: str) -> None:
+        command: str) -> None:
     """
     Command to allow the user to cancel a WTC Code Clinic Booking System time
     slot they have booked as a volunteer
     :param credentials.Credentials clinic_credentials: Clinic token credentials
-    :param str command_arg: WTC Code Clinic Booking System command
+    :param str command: WTC Code Clinic Booking System command
     :return: None
     """
-    # Updates local user calendar file if data is not up-to-date
+    # Updates local clinic calendar file if data is not up-to-date
     update_local_calendar(clinic_credentials, 'clinic')
 
     # Retrieves the cancel volunteer time slot index from the command
-    volunteer_slot_key: str = get_command_argument(command_arg)
+    volunteer_slot_key: str = get_command_argument(command)
 
-    # Retrieves the user calendar event data from the local file
+    # Retrieves the clinic calendar event data from the local file
     clinic_calendar_event_data: dict[str, list[dict]] = \
         code_clinic_calendar_files.read_clinic_calendar_file()
 
@@ -184,7 +185,7 @@ def cancel_volunteer_slot(
     # Retrieves the retractable volunteer slots to cancel
     retractable_volunteer_slots: dict[str, dict[str, str]] = \
         helpers.get_retractable_volunteer_slots(
-            clinic_calendar_event_data, username)
+            username, clinic_calendar_event_data)
 
     # Checks if cancel volunteer time slot index from command is valid
     if helpers.check_dictionary_key_is_valid(
@@ -199,15 +200,16 @@ def cancel_volunteer_slot(
         return
 
     # Confirms with the user if they wish to cancel the desired time slot
-    if code_clinic_input.input_confirm_cancel_volunteer_slot(
-            volunteer_slot['datetime']):
+    if code_clinic_input.input_confirm_cancel_code_clinic_time_slot(
+            volunteer_slot['datetime'], 'volunteer'):
 
-        # Uses the API function to book the time slot
-        code_clinic_api.cancel_volunteer_booking(
+        # Uses the API function to cancel the time slot
+        code_clinic_api.cancel_booking(
             clinic_credentials, volunteer_slot['event_id'])
 
+        # Outputs a cancel booking success message
         code_clinic_output.output_cancel_booking_successful(
-            volunteer_slot['datetime'])
+            volunteer_slot['datetime'], 'volunteer')
 
 
 def display_student_slots(clinic_credentials: credentials.Credentials) -> None:
@@ -232,13 +234,65 @@ def display_student_slots(clinic_credentials: credentials.Credentials) -> None:
         username, clinic_calendar_event_data)
 
 
-def command_handler(command_arg):
+def cancel_student_booking(
+        clinic_credentials: credentials.Credentials,
+        command: str) -> None:
+    """
+    Command to allow the user to cancel a WTC Code Clinic Booking System time
+    slot they have booked as a student
+    :param credentials.Credentials clinic_credentials: Clinic token credentials
+    :param str command: WTC Code Clinic Booking System command
+    :return: None
+    """
+    # Updates local clinic calendar file if data is not up-to-date
+    update_local_calendar(clinic_credentials, 'clinic')
+
+    # Retrieves the cancel student time slot index from the command
+    student_slot_key: str = get_command_argument(command)
+
+    # Retrieves the clinic calendar event data from the local file
+    clinic_calendar_event_data: dict[str, list[dict]] = \
+        code_clinic_calendar_files.read_clinic_calendar_file()
+
+    # Retrieves the username from the config file
+    username: str = code_clinic_config.get_username()
+
+    # Retrieves the user booked student slots to cancel
+    user_booked_student_slots: dict[str, dict[str, str]] = \
+        helpers.get_user_booked_student_slots(
+            username, clinic_calendar_event_data)
+
+    # Checks if cancel student time slot index from command is valid
+    if helpers.check_dictionary_key_is_valid(
+            student_slot_key, user_booked_student_slots):
+
+        # Retrieves the user's booked student time slot using the student time
+        # slot index
+        student_slot: dict[str, str] = \
+            user_booked_student_slots[student_slot_key]
+    else:
+        code_clinic_output.output_cancel_student_booking_slot_invalid()
+        return
+
+    # Confirms with the user if they wish to cancel the desired time slot
+    if code_clinic_input.input_confirm_cancel_code_clinic_time_slot(
+            student_slot['datetime'], 'student'):
+        # Uses the API function to cancel the time slot
+        code_clinic_api.cancel_booking(
+            clinic_credentials, student_slot['event_id'])
+
+        # Outputs a cancel booking success message
+        code_clinic_output.output_cancel_booking_successful(
+            student_slot['datetime'], 'student')
+
+
+def command_handler(command):
     """It handles commands from the command line arguments.
     """
-    if command_arg in {'-h', 'help', '--help', ''}:
+    if command in {'-h', 'help', '--help', ''}:
         help_command()
         return
-    elif command_arg == 'login':
+    elif command == 'login':
         login()
         return
     elif code_clinic_token.check_user_token_expired():
@@ -251,17 +305,19 @@ def command_handler(command_arg):
     clinic_credentials: credentials.Credentials = \
         code_clinic_token.return_clinic_credentials()
 
-    if command_arg == 'student_calendar':
+    if command == 'my_calendar':
         display_calendar(user_credentials, 'user')
-    elif command_arg == 'clinic_calendar':
+    elif command == 'clinic_calendar':
         display_calendar(clinic_credentials, 'clinic')
-    elif command_arg == 'volunteer_slots':
+    elif command == 'volunteer_slots':
         display_volunteer_slots(clinic_credentials)
-    elif re.match(r'^book_volunteer_slot \d+$', command_arg):
-        book_volunteer_slot(clinic_credentials, command_arg)
-    elif command_arg == 'my_volunteer_slots':
+    elif re.match(r'^book_volunteer_slot \d+$', command):
+        book_volunteer_slot(clinic_credentials, command)
+    elif command == 'my_volunteer_bookings':
         display_user_volunteer_slots(clinic_credentials)
-    elif re.match(r'^cancel_volunteer_booking \d+$', command_arg):
-        cancel_volunteer_slot(clinic_credentials, command_arg)
-    elif command_arg == 'student_slots':
+    elif re.match(r'^cancel_volunteer_booking \d+$', command):
+        cancel_volunteer_booking(clinic_credentials, command)
+    elif command == 'student_slots':
         display_student_slots(clinic_credentials)
+    elif re.match(r'^cancel_student_booking \d+$', command):
+        cancel_student_booking(clinic_credentials, command)
