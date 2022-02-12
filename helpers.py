@@ -111,6 +111,15 @@ def get_event_summary(calendar_event: dict) -> str:
     return calendar_event['summary']
 
 
+def get_event_volunteer_location(calendar_event: dict) -> str:
+    """
+    Returns the volunteer's campus location from the calendar event
+    :param dict calendar_event: Calendar event
+    :return: Calendar event summary
+    """
+    return calendar_event['attendees'][0]['comment'].split(' - ')[1]
+
+
 def format_calendar_events_to_table(
         calendar_event_data: dict[str, list[dict]]) \
         -> list[list[str]]:
@@ -143,7 +152,7 @@ def get_available_volunteer_slots(calendar_event_data):
             if not check_volunteer_slot_booked(event):
                 available_slots[str(indexing)] = \
                     get_volunteer_slot_information(event)
-                indexing += 1
+            indexing += 1
     return available_slots
 
 
@@ -213,7 +222,7 @@ def format_clinic_time_slots_to_table(
                 table_row[table_row_index] = 'BOOKED'
             else:
                 table_row[table_row_index] = f'({index})'
-                index += 1
+            index += 1
         output_table.append(table_row)
     return output_table
 
@@ -267,7 +276,7 @@ def check_student_slot_booked_by_volunteer_only(
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if len(attendees) == 1:
                 return get_event_volunteer_email(calendar_event) != username \
-                    and attendees[0]['comment'] == 'Volunteer'
+                    and 'Volunteer' in attendees[0]['comment']
         return False
     except KeyError:
         return False
@@ -286,7 +295,7 @@ def check_volunteer_slot_booked_by_user_only(
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if len(attendees) == 1:
                 return get_event_volunteer_email(calendar_event) == username \
-                    and attendees[0]['comment'] == 'Volunteer'
+                    and 'Volunteer' in attendees[0]['comment']
         return False
     except KeyError:
         return False
@@ -305,7 +314,7 @@ def check_volunteer_slot_booked_by_user(
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if attendees:
                 return get_event_volunteer_email(calendar_event) == username \
-                    and attendees[0]['comment'] == 'Volunteer'
+                    and 'Volunteer' in attendees[0]['comment']
         return False
     except KeyError:
         return False
@@ -320,10 +329,9 @@ def get_time_slot_information(calendar_event: dict) -> dict[str, str]:
     return \
         {
             'event_id': calendar_event['id'],
-            'datetime': calendar_event['start']['event_date'] + ' (' +
-            calendar_event['start']['event_date'] + ' (' +
-            calendar_event['start']['event_time'] + ' - ' +
-            calendar_event['end']['event_time'] + ')'
+            'datetime': f"{calendar_event['start']['event_date']} "
+                        f"({calendar_event['start']['event_time']} - "
+                        f"{calendar_event['end']['event_time']})"
         }
 
 
@@ -345,7 +353,7 @@ def get_available_student_slots(
             if check_student_slot_booked_by_volunteer_only(username, event):
                 available_slots[str(index)] = \
                     get_time_slot_information(event)
-                index += 1
+            index += 1
     return available_slots
 
 
@@ -370,9 +378,10 @@ def format_calendar_events_to_available_student_bookings(
             if check_student_slot_booked_by_volunteer_only(username, event):
                 table_row = \
                     [f'({index})', date, get_event_time_period(event),
-                     get_event_summary(event), get_event_volunteer_email(event)]
+                     get_event_volunteer_location(event),
+                     get_event_volunteer_email(event)]
                 output_table.append(table_row)
-                index += 1
+            index += 1
     return output_table
 
 
@@ -393,7 +402,7 @@ def get_retractable_volunteer_slots(
             if check_volunteer_slot_booked_by_user_only(username, event):
                 retractable_volunteer_slots[str(indexing)] = \
                     get_volunteer_slot_information(event)
-                indexing += 1
+            indexing += 1
     return retractable_volunteer_slots
 
 
@@ -410,18 +419,17 @@ def format_user_booked_volunteer_slots_to_table(
     output_table: list[list[str]] = []
     table_row: list[str]
     table_row_index: int
-    index: int = 0
+    index: int = 1
 
     for date, events in calendar_event_data.items():
         for event in events:
             if check_volunteer_slot_booked_by_user(username, event):
                 if check_volunteer_slot_booked_by_user_only(username, event):
-                    index += 1
                     table_row = [f'({index})']
                 else:
                     table_row = ['-']
                 table_row += [date, get_event_time_period(event),
                               get_event_student_email(event)]
                 output_table.append(table_row)
-
+            index += 1
     return output_table

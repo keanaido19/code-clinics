@@ -136,6 +136,80 @@ def book_volunteer_slot(clinic_credentials: credentials.Credentials,
         code_clinic_output.output_booking_successful(volunteer_slot['datetime'])
 
 
+def display_user_volunteer_slots(clinic_credentials: credentials.Credentials) \
+        -> None:
+    """
+    Displays the WTC Code Clinic time slots booked by the user as a volunteer
+    :param credentials.Credentials clinic_credentials: Clinic token credentials
+    :return: None
+    """
+    # Updates local user calendar file if data is not up-to-date
+    update_local_calendar(clinic_credentials, 'clinic')
+
+    # Retrieves the user calendar event data from the local file
+    user_calendar_event_data: dict[str, list[dict]] = \
+        code_clinic_calendar_files.read_clinic_calendar_file()
+
+    # Retrieves the user's username from the config file
+    username: str = code_clinic_config.get_username()
+
+    # Outputs the user's booked volunteer slots as a table
+    code_clinic_output.output_user_booked_volunteer_slots(
+        username, user_calendar_event_data)
+
+
+def cancel_volunteer_slot(
+        clinic_credentials: credentials.Credentials,
+        command_arg: str) -> None:
+    """
+    Command to allow the user to cancel a WTC Code Clinic Booking System time
+    slot they have booked as a volunteer
+    :param credentials.Credentials clinic_credentials: Clinic token credentials
+    :param str command_arg: WTC Code Clinic Booking System command
+    :return: None
+    """
+    # Updates local user calendar file if data is not up-to-date
+    update_local_calendar(clinic_credentials, 'clinic')
+
+    # Retrieves the cancel volunteer time slot index from the command
+    volunteer_slot_key: str = get_command_argument(command_arg)
+
+    # Retrieves the user calendar event data from the local file
+    clinic_calendar_event_data: dict[str, list[dict]] = \
+        code_clinic_calendar_files.read_clinic_calendar_file()
+
+    # Retrieves the username from the config file
+    username: str = code_clinic_config.get_username()
+
+    # Retrieves the retractable volunteer slots to cancel
+    retractable_volunteer_slots: dict[str, dict[str, str]] = \
+        helpers.get_retractable_volunteer_slots(
+            clinic_calendar_event_data, username)
+
+    # Checks if cancel volunteer time slot index from command is valid
+    if helpers.check_dictionary_key_is_valid(
+            volunteer_slot_key, retractable_volunteer_slots):
+
+        # Retrieves the retractable time slot using the volunteer time slot
+        # index
+        volunteer_slot: dict[str, str] = \
+            retractable_volunteer_slots[volunteer_slot_key]
+    else:
+        code_clinic_output.output_cancel_volunteer_booking_slot_invalid()
+        return
+
+    # Confirms with the user if they wish to cancel the desired time slot
+    if code_clinic_input.input_confirm_cancel_volunteer_slot(
+            volunteer_slot['datetime']):
+
+        # Uses the API function to book the time slot
+        code_clinic_api.cancel_volunteer_booking(
+            clinic_credentials, volunteer_slot['event_id'])
+
+        code_clinic_output.output_cancel_booking_successful(
+            volunteer_slot['datetime'])
+
+
 def display_student_slots(clinic_credentials: credentials.Credentials) -> None:
     """
     Command to allow the user to view the available WTC Code Clinic Booking
@@ -156,28 +230,6 @@ def display_student_slots(clinic_credentials: credentials.Credentials) -> None:
     # Outputs the available student slots as a table
     code_clinic_output.output_student_slots(
         username, clinic_calendar_event_data)
-
-
-def display_user_volunteer_slots(user_credentials: credentials.Credentials) \
-        -> None:
-    """
-    Displays the WTC Code Clinic time slots booked by the user as a volunteer
-    :param credentials.Credentials user_credentials: User token credentials
-    :return: None
-    """
-    # Updates local user calendar file if data is not up-to-date
-    update_local_calendar(user_credentials, 'user')
-
-    # Retrieves the user calendar event data from the local file
-    user_calendar_event_data: dict[str, list[dict]] = \
-        code_clinic_calendar_files.read_user_calendar_file()
-
-    # Retrieves the user's username from the config file
-    username: str = code_clinic_config.get_username()
-
-    # Outputs the user's booked volunteer slots as a table
-    code_clinic_output.output_user_booked_volunteer_slots(
-        username, user_calendar_event_data)
 
 
 def command_handler(command_arg):
@@ -207,7 +259,9 @@ def command_handler(command_arg):
         display_volunteer_slots(clinic_credentials)
     elif re.match(r'^book_volunteer_slot \d+$', command_arg):
         book_volunteer_slot(clinic_credentials, command_arg)
+    elif command_arg == 'my_volunteer_slots':
+        display_user_volunteer_slots(clinic_credentials)
+    elif re.match(r'^cancel_volunteer_booking \d+$', command_arg):
+        cancel_volunteer_slot(clinic_credentials, command_arg)
     elif command_arg == 'student_slots':
         display_student_slots(clinic_credentials)
-    elif command_arg == 'my_volunteer_slots':
-        display_user_volunteer_slots(user_credentials)
