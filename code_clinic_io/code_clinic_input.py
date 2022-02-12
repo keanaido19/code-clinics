@@ -42,14 +42,15 @@ def get_location():
         'Please enter your campus location (DBN\\JHB\\CPT): ').upper().strip()
 
 
-def input_confirm_cancel_volunteer_slot(time_slot: str) \
+def input_confirm_cancel_code_clinic_time_slot(time_slot: str, user_type: str) \
         -> bool:
     """
     Asks the user to confirm whether they want to cancel their volunteer
     booking at the specified time slot
     :param str time_slot: Specified time slot to book
+    :param str user_type: str user_type: Type of user, volunteer or student
     :return: Boolean value
     """
-    return input(f'Confirm cancellation of volunteer booking for Code Clinic '
+    return input(f'Confirm cancellation of {user_type} booking for Code Clinic '
                  f'time slot : {time_slot}? (yes\\no)\n').lower().strip() \
         in {'yes', 'y'}
