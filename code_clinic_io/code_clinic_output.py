@@ -29,8 +29,14 @@ def display_help():
 
     print("""Here is a list of valid commands:
 > login - Enables the user to login to the system
-> student_calendar - Allows the user to view their student calendar
+> my_calendar - Allows the user to view their student calendar
 > clinic_calendar - Allows the user to view the code clinic calendar 
+> volunteer_slots - ...
+> book_volunteer_slot <index> - ...
+> my_volunteer_bookings - ...
+> cancel_volunteer_booking <index> - ...
+> student_slots - ...
+> cancel_student_booking <index> - ...
 """)
 
 
@@ -207,13 +213,25 @@ def output_cancel_volunteer_booking_slot_invalid() -> None:
     """
     print("The time slot you wish to cancel as a volunteer has not been "
           "booked by you, please refer to your volunteer time slots using"
-          "\n\n    code-clinic my_volunteer_slots\n")
+          "\n\n    code-clinic my_volunteer_bookings\n")
 
 
-def output_cancel_booking_successful(time_slot: str) -> None:
+def output_cancel_student_booking_slot_invalid() -> None:
+    """
+    Prints out an invalid cancel student booking slot message for the user
+    :return: None
+    """
+    print("The time slot you wish to cancel as a student has not been "
+          "booked by you, please refer to your student time slots using"
+          "\n\n    code-clinic my_student_bookings\n")
+
+
+def output_cancel_booking_successful(time_slot: str, user_type: str) -> None:
     """
     Prints out a cancellation successful message to the user
     :param str time_slot: Specified time slot to cancel
+    :param str user_type: str user_type: Type of user, volunteer or student
     :return: Boolean value
     """
-    print(f'\nCode Clinic time slot - {time_slot} - successfully cancelled!\n')
+    print(f'\nCode Clinic {user_type} booking for time slot - {time_slot} - '
+          f'successfully cancelled!\n')
