@@ -50,7 +50,7 @@ def get_calendar_event_start(calendar_event):
     '''
     dt = datetime.datetime
     start_time = \
-        calendar_event['start'] \
+        calendar_event['start']\
         .get('dateTime', calendar_event['start'].get('date'))
     return convert_to_local_timezone(dt.fromisoformat(start_time))
 
