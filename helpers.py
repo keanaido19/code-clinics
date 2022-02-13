@@ -50,7 +50,7 @@ def get_calendar_event_start(calendar_event):
     '''
     dt = datetime.datetime
     start_time = \
-        calendar_event['start']\
+        calendar_event['start'] \
         .get('dateTime', calendar_event['start'].get('date'))
     return convert_to_local_timezone(dt.fromisoformat(start_time))
 
@@ -153,7 +153,13 @@ def get_event_volunteer_location(calendar_event: dict) -> str:
     :param dict calendar_event: Calendar event
     :return: Calendar event summary
     """
-    return calendar_event['attendees'][0]['comment'].split(' - ')[1]
+    volunteer_comment: str = next(
+        (
+            attendee['comment']
+            for attendee in calendar_event['attendees']
+            if 'Volunteer' in attendee['comment']
+        ), 'Unknown - Unknown')
+    return volunteer_comment.split(' - ')[1]
 
 
 def format_calendar_events_to_table(
@@ -284,7 +290,12 @@ def get_event_volunteer_email(calendar_event: dict) -> str:
     :param dict calendar_event: Calendar event
     :return: Volunteer's email address
     """
-    return calendar_event['attendees'][0]['email']
+    return next(
+        (
+            attendee['email']
+            for attendee in calendar_event['attendees']
+            if 'Volunteer' in attendee['comment']
+        ), '-')
 
 
 def get_event_student_email(calendar_event: dict) -> str:
@@ -293,16 +304,12 @@ def get_event_student_email(calendar_event: dict) -> str:
     :param dict calendar_event: Calendar event
     :return: Student's email address
     """
-    try:
-        return next(
+    return next(
             (
                 attendee['email']
                 for attendee in calendar_event['attendees']
                 if 'Student' in attendee['comment']
             ), '-')
-
-    except IndexError:
-        return '-'
 
 
 def check_code_clinic_slot_booked_by_volunteer_only(
@@ -317,8 +324,8 @@ def check_code_clinic_slot_booked_by_volunteer_only(
         if calendar_event['summary'] == 'Code Clinic':
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if len(attendees) == 1:
-                return get_event_volunteer_email(calendar_event) != username \
-                    and 'Volunteer' in attendees[0]['comment']
+                return attendees[0]['email'] != username \
+                       and 'Volunteer' in attendees[0]['comment']
         return False
     except KeyError:
         return False
@@ -336,8 +343,8 @@ def check_code_clinic_slot_booked_by_user_as_volunteer_only(
         if calendar_event['summary'] == 'Code Clinic':
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if len(attendees) == 1:
-                return get_event_volunteer_email(calendar_event) == username \
-                    and 'Volunteer' in attendees[0]['comment']
+                return attendees[0]['email'] == username \
+                       and 'Volunteer' in attendees[0]['comment']
         return False
     except KeyError:
         return False
@@ -456,7 +463,6 @@ def format_calendar_events_to_available_student_bookings(
     """
     output_table: list[list[str]] = []
     table_row: list[str]
-    table_row_index: int
     index: int = 1
 
     for date, events in calendar_event_data.items():
@@ -506,7 +512,6 @@ def format_user_booked_volunteer_slots_to_table(
     """
     output_table: list[list[str]] = []
     table_row: list[str]
-    table_row_index: int
     index: int = 1
 
     for date, events in calendar_event_data.items():
@@ -520,6 +525,32 @@ def format_user_booked_volunteer_slots_to_table(
                     table_row = ['-']
                 table_row += [date, get_event_time_period(event),
                               get_event_student_email(event)]
+                output_table.append(table_row)
+            index += 1
+    return output_table
+
+
+def format_user_booked_student_slots_to_table(
+        calendar_event_data: dict[str, list[dict]], username: str) \
+        -> list[list[str]]:
+    """
+    Extracts the user's booked student slots from their calendar even data
+    and converts it into table format
+    :param dict[str, list[dict]] calendar_event_data: Calendar event data
+    :param str username: The current user's username
+    :return: User's booked volunteer slots as table format
+    """
+    output_table: list[list[str]] = []
+    table_row: list[str]
+    index: int = 1
+
+    for date, events in calendar_event_data.items():
+        for event in events:
+            if check_code_clinic_time_slot_booked_by_user_as_student(
+                    username, event):
+                table_row = [f'({index})', date, get_event_time_period(event),
+                             get_event_volunteer_location(event),
+                             get_event_volunteer_email(event)]
                 output_table.append(table_row)
             index += 1
     return output_table

@@ -29,7 +29,7 @@ def input_confirm_time_slot(time_slot: str, user_type: str) \
     :param str user_type: Type of user, volunteer or student
     :return: Boolean value
     """
-    return input(f'Confirm {user_type} booking for Code Clinic time slot : '
+    return input(f'\nConfirm {user_type} booking for Code Clinic time slot : '
                  f'{time_slot}? (yes\\no)\n').lower().strip() in {'yes', 'y'}
 
 
@@ -51,6 +51,6 @@ def input_confirm_cancel_code_clinic_time_slot(time_slot: str, user_type: str) \
     :param str user_type: str user_type: Type of user, volunteer or student
     :return: Boolean value
     """
-    return input(f'Confirm cancellation of {user_type} booking for Code Clinic '
-                 f'time slot : {time_slot}? (yes\\no)\n').lower().strip() \
-        in {'yes', 'y'}
+    return input(f'\nConfirm cancellation of {user_type} booking for Code '
+                 f'Clinic time slot : {time_slot}? (yes\\no)\n')\
+        .lower().strip() in {'yes', 'y'}

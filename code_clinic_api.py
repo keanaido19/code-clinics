@@ -95,23 +95,20 @@ def book_code_clinic_time_slot(
     # Set the events maximum allowable number of attendees
     calendar_event['maxAttendees']: int = 2
 
+    # Sets the attendee data that will be added to the event
+    attendee_data: dict[str, str] = \
+        {
+            'email': username,
+            'comment': f'{user_type} - {campus_location}',
+            'responseStatus': 'accepted',
+        }
+
     # Checks for the events attendees and adds the user to the event's
     # attendees list
     if helpers.check_dictionary_key_is_valid('attendees', calendar_event):
-        calendar_event['attendees'].append(
-            {
-                'email': username,
-                'comment': f'{user_type} - {campus_location}',
-                'responseStatus': 'accepted',
-            }
-        )
+        calendar_event['attendees'].append(attendee_data)
     else:
-        calendar_event['attendees']: list[dict[str, str]] = \
-            [{
-                'email': username,
-                'comment': f'{user_type} - {campus_location}',
-                'responseStatus': 'accepted',
-            }]
+        calendar_event['attendees']: list[dict[str, str]] = [attendee_data]
 
     # Updates the Google Calendar event with the new modified event with the
     # user as an attendee
