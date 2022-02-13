@@ -504,8 +504,8 @@ def format_user_booked_volunteer_slots_to_table(
         calendar_event_data: dict[str, list[dict]], username: str) \
         -> list[list[str]]:
     """
-    Extracts the user's booked volunteer slots from their calendar even data
-    and converts it into table format
+    Extracts the user's booked volunteer slots from the calendar event data and
+    converts it into table format
     :param dict[str, list[dict]] calendar_event_data: Calendar event data
     :param str username: The current user's username
     :return: User's booked volunteer slots as table format
@@ -534,8 +534,8 @@ def format_user_booked_student_slots_to_table(
         calendar_event_data: dict[str, list[dict]], username: str) \
         -> list[list[str]]:
     """
-    Extracts the user's booked student slots from their calendar even data
-    and converts it into table format
+    Extracts the user's booked student slots from the calendar event data and
+    converts it into table format
     :param dict[str, list[dict]] calendar_event_data: Calendar event data
     :param str username: The current user's username
     :return: User's booked volunteer slots as table format
