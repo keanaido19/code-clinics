@@ -96,7 +96,7 @@ def output_volunteer_slots(clinic_calendar_event_data: dict[str, list[dict]]) \
 
     headers: list[str] = \
         ['Date\\Time', '09:00AM', '09:30AM', '10:00AM', '10:30AM',
-         '11:00AM', '11:30PM', '12:00PM', '12:30PM', '13:00PM', '13:30PM',
+         '11:00AM', '11:30AM', '12:00PM', '12:30PM', '13:00PM', '13:30PM',
             '14:00PM', '14:30PM', '15:00PM', '15:30PM', '16:00PM', '16:30PM',
          '17:00PM', '17:30PM']
 
@@ -138,6 +138,14 @@ def output_no_available_student_bookings() -> None:
     print('There are currently no Code Clinic time slots that you can book '
           'as a student.')
 
+def output_student_booking_slot_invalid():
+    """
+    Prints out an invalid student booking slot message for the user
+    :return: None
+    """
+    print("The time slot you wish to book as a student is not available, "
+          "please refer to the available time slots using"
+          "\n\n    code-clinic student_slots\n")
 
 def output_student_slots(
         username: str,
