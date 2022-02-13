@@ -225,7 +225,7 @@ def output_cancel_volunteer_booking_slot_invalid() -> None:
     """
     print("\nThe time slot you wish to cancel as a volunteer has not been "
           "booked by you, or has been booked by a student,\n\nplease refer to "
-          "your volunteer time slots using\n\n    code-clinic "
+          "your volunteer bookings using\n\n    code-clinic "
           "my_volunteer_bookings\n")
 
 
@@ -235,7 +235,7 @@ def output_cancel_student_booking_slot_invalid() -> None:
     :return: None
     """
     print("\nThe time slot you wish to cancel as a student has not been "
-          "booked by you,\n\nplease refer to your student time slots using"
+          "booked by you,\n\nplease refer to your student bookings using"
           "\n\n    code-clinic my_student_bookings\n")
 
 
