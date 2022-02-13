@@ -118,8 +118,8 @@ def output_volunteer_booking_slot_invalid() -> None:
     Prints out an invalid volunteer booking slot message for the user
     :return: None
     """
-    print("\nThe time slot you wish to book as a volunteer is not available,"
-          "\n\nplease refer to the available time slots using\n\n    "
+    print("\nThe time slot you wish to book as a volunteer is not available."
+          "\n\nPlease refer to the available time slots using\n\n    "
           "code-clinic volunteer_slots\n")
 
 
@@ -146,8 +146,8 @@ def output_student_booking_slot_invalid():
     Prints out an invalid student booking slot message for the user
     :return: None
     """
-    print("\nThe time slot you wish to book as a student is not available,\n\n"
-          "please refer to the available time slots using"
+    print("\nThe time slot you wish to book as a student is not available.\n\n"
+          "Please refer to the available time slots using"
           "\n\n    code-clinic student_slots\n")
 
 
@@ -224,7 +224,7 @@ def output_cancel_volunteer_booking_slot_invalid() -> None:
     :return: None
     """
     print("\nThe time slot you wish to cancel as a volunteer has not been "
-          "booked by you, or has been booked by a student,\n\nplease refer to "
+          "booked by you, or has been booked by a student.\n\nPlease refer to "
           "your volunteer bookings using\n\n    code-clinic "
           "my_volunteer_bookings\n")
 
@@ -235,7 +235,7 @@ def output_cancel_student_booking_slot_invalid() -> None:
     :return: None
     """
     print("\nThe time slot you wish to cancel as a student has not been "
-          "booked by you,\n\nplease refer to your student bookings using"
+          "booked by you.\n\nPlease refer to your student bookings using"
           "\n\n    code-clinic my_student_bookings\n")
 
 
