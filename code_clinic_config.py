@@ -30,12 +30,12 @@ def get_path_to_config_file():
     return os.path.join(os.environ["HOME"], 'code-clinic/config.json')
 
 
-def update_config(email, location):
+def update_config(email, location, days = '7'):
     """
     Updates the config file in the user's home directory'
     """
 
-    config_dict = {'username': email, 'campus': location}
+    config_dict = {'username': email, 'campus': location, 'days': days}
 
     with open(get_path_to_config_file(), 'w') as file_object:
         json.dump(config_dict, file_object)
@@ -88,3 +88,23 @@ def get_campus_location() -> str:
     with open(get_path_to_config_file(), 'r') as config:
         config_data = json.load(config)
         return config_data['campus']
+
+def get_days():
+    """
+    Returns the number of days from the config file
+    :return: The number of days to be displayed in calendar
+    """
+    with open(get_path_to_config_file(), 'r') as config:
+        config_data = json.load(config)
+        return config_data['days']
+
+def update_config_days(days):
+    """
+    Function enables the number of calendar days to be configurable. It updates the config file based on
+    what the user has specified. 
+    """
+    config_data = {}
+    with open(get_path_to_config_file(), 'r') as config:
+        config_data = json.load(config)
+    config_data['days'] = days
+    update_config(config_data['username'], config_data['campus'], config_data['days'])
