@@ -398,3 +398,16 @@ def command_handler(command):
         display_user_student_bookings(clinic_credentials)
     elif re.match(r'^cancel_student_booking \d+$', command):
         cancel_student_booking(clinic_credentials, command)
+    elif re.match(r'^set_calendar_size \d+$', command):
+        set_calendar_size(command)
+
+
+def set_calendar_size(command):
+    """
+    Functions sets the number of days to be displayed in the calendar
+    """
+    days = get_command_argument(command)
+    if days == '0':
+        days = '7'
+    code_clinic_config.update_config_days(days)
+    code_clinic_output.output_calendar_size_updated()

@@ -26,8 +26,8 @@ def get_calendar_data(calendar_service):
     """
     get the calendar data for a given number of days
     """
-
-    now, end = helpers.get_date_range(7)
+    days = code_clinic_config.get_days()
+    now, end = helpers.get_date_range(int(days))
 
     return calendar_service.events().list(
         calendarId='primary',

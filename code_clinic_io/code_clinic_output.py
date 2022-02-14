@@ -285,3 +285,10 @@ def output_user_booked_student_slots(
     )
     print("\nAn indexed student booking can be canceled by using"
           "\n\n    code-clinic cancel_student_booking <index>\n")
+
+
+def output_calendar_size_updated():
+    """
+    Function prints a message when the calendar size has been updated
+    """
+    print('\nCalendar size successfully updated!\n')
