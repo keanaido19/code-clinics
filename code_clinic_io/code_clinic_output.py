@@ -295,10 +295,16 @@ def output_calendar_size_updated():
 
 
 def output_invalid_username():
-
+    """
+    Prints out an invalid username message to the user
+    :return: None
+    """
     print('Username is invalid!')
 
 
 def output_invalid_campus_location():
-
+    """
+    Prints out an invalid campus location message to the user
+    :return: None
+    """
     print('Campus location is invalid!')

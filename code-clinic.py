@@ -15,8 +15,8 @@ from code_clinic_commands import commands
 
 
 def main():
-    """Main function for the code clinic booking system
-
+    """
+    Main function for the code clinic booking system
     """
 
     if not code_clinic_config.verify_config_file():

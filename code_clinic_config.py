@@ -132,10 +132,13 @@ def verify_config_data(config_data):
     Verifies the contents of the configuration file
     """
     try:
-        return helpers.verify_email_address(config_data['username']) and helpers.verify_campus_location(config_data['campus']) and helpers.verify_config_days(config_data['days'])
+        return helpers.verify_email_address(config_data['username']) and \
+               helpers.verify_campus_location(config_data['campus']) and \
+               helpers.verify_config_days(config_data['days'])
 
     except KeyError:
         return False
+
 
 def create_config_file():
     """ 

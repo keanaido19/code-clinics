@@ -564,7 +564,8 @@ def verify_email_address(email_address):
     Checks that the email address is a valid WTC address.
     """
     
-    return re.match(r'^\w+@student.wethinkcode.co.za$', email_address) and  not not validate_email.validate_email(email_address, verify = True)
+    return re.match(r'^\w+@student.wethinkcode.co.za$', email_address) and  \
+        not not validate_email.validate_email(email_address, verify=True)
 
 
 def verify_campus_location(campus_location):
@@ -572,7 +573,8 @@ def verify_campus_location(campus_location):
     Verifies the input provided for the campus location
     """
 
-    return campus_location in {'DBN','JHB','CPT'}
+    return campus_location in {'DBN', 'JHB', 'CPT'}
+
 
 def verify_config_days(days):
     """
@@ -615,3 +617,14 @@ def get_campus_location():
             return campus_location
 
         code_clinic_output.output_invalid_campus_location()
+
+
+def adjust_days_for_calendar_size(days: int) -> int:
+    """
+    Adjusts the days for the calendar size depending on the current time
+    :param int days: Number of days to be downloaded for the calendars
+    :return: Adjusted number of days to be downloaded for the calendars
+    depending on the current time
+    """
+    return days if datetime.time(17, 30) < datetime.datetime.now().time() else \
+        days - 1
