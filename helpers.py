@@ -6,6 +6,9 @@ from __future__ import annotations
 import datetime
 
 from pytz import timezone
+import re
+import validate_email
+from code_clinic_io import code_clinic_input, code_clinic_output
 
 
 def get_current_utc_date():
@@ -239,7 +242,7 @@ def get_volunteer_slot_table_row_index(calendar_event: dict) -> int:
             dt(13, 0): 9, dt(13, 30): 10, dt(14, 0): 11, dt(14, 30): 12,
             dt(15, 0): 13, dt(15, 30): 14, dt(16, 0): 15, dt(16, 30): 16,
             dt(17, 0): 17, dt(17, 30): 18
-        }
+    }
     return table_row_index_dict[time_key]
 
 
@@ -305,11 +308,11 @@ def get_event_student_email(calendar_event: dict) -> str:
     :return: Student's email address
     """
     return next(
-            (
-                attendee['email']
-                for attendee in calendar_event['attendees']
-                if 'Student' in attendee['comment']
-            ), '-')
+        (
+            attendee['email']
+            for attendee in calendar_event['attendees']
+            if 'Student' in attendee['comment']
+        ), '-')
 
 
 def check_code_clinic_slot_booked_by_volunteer_only(
@@ -325,7 +328,7 @@ def check_code_clinic_slot_booked_by_volunteer_only(
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if len(attendees) == 1:
                 return attendees[0]['email'] != username \
-                       and 'Volunteer' in attendees[0]['comment']
+                    and 'Volunteer' in attendees[0]['comment']
         return False
     except KeyError:
         return False
@@ -344,7 +347,7 @@ def check_code_clinic_slot_booked_by_user_as_volunteer_only(
             attendees: list[dict[str, str]] = calendar_event['attendees']
             if len(attendees) == 1:
                 return attendees[0]['email'] == username \
-                       and 'Volunteer' in attendees[0]['comment']
+                    and 'Volunteer' in attendees[0]['comment']
         return False
     except KeyError:
         return False
@@ -554,3 +557,61 @@ def format_user_booked_student_slots_to_table(
                 output_table.append(table_row)
             index += 1
     return output_table
+
+
+def verify_email_address(email_address):
+    """
+    Checks that the email address is a valid WTC address.
+    """
+    
+    return re.match(r'^\w+@student.wethinkcode.co.za$', email_address) and  not not validate_email.validate_email(email_address, verify = True)
+
+
+def verify_campus_location(campus_location):
+    """
+    Verifies the input provided for the campus location
+    """
+
+    return campus_location in {'DBN','JHB','CPT'}
+
+def verify_config_days(days):
+    """
+    Verifies that a correct number of days is entered
+    """
+
+    try:
+        config_days = int(days)
+        return config_days > 0
+
+    except (TypeError, ValueError):
+        return False
+
+
+def get_email_address():
+
+    """
+    Returns a valid email address
+    """
+
+    while True:
+        email_address = code_clinic_input.get_username()
+
+        if verify_email_address(email_address):
+            return email_address
+
+        code_clinic_output.output_invalid_username()
+
+
+def get_campus_location():
+    """
+    Returns a valid campus location 
+    """
+
+    while True:
+        campus_location = code_clinic_input.get_location()
+
+        if verify_campus_location(campus_location):
+
+            return campus_location
+
+        code_clinic_output.output_invalid_campus_location()

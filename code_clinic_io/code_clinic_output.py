@@ -292,3 +292,13 @@ def output_calendar_size_updated():
     Function prints a message when the calendar size has been updated
     """
     print('\nCalendar size successfully updated!\n')
+
+
+def output_invalid_username():
+
+    print('Username is invalid!')
+
+
+def output_invalid_campus_location():
+
+    print('Campus location is invalid!')
