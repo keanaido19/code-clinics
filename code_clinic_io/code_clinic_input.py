@@ -16,9 +16,8 @@ def get_username():
     """Prompts the user for a username.
     """
 
-    username = input('Please enter username: ').strip()
-
-    return username
+    return \
+        input('Please provide the username for the booking system:\n').strip()
 
 
 def input_confirm_time_slot(time_slot: str, user_type: str) \
@@ -39,7 +38,7 @@ def get_location():
     """
 
     return input(
-        'Please enter your campus location (DBN\\JHB\\CPT): ').upper().strip()
+        'Please enter your campus location (DBN\\JHB\\CPT):\n').strip()
 
 
 def input_confirm_cancel_code_clinic_time_slot(time_slot: str, user_type: str) \
