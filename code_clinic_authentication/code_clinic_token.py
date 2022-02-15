@@ -37,7 +37,7 @@ def create_token_directory():
 def get_path_to_token_directory():
     """Returns the path to the token directory"""
 
-    return os.path.join(os.environ["HOME"], '.code-clinic')
+    return os.path.join(os.environ["HOME"], '.token/code_clinic')
 
 
 def check_if_token_directory_exists():
@@ -49,7 +49,7 @@ def check_if_token_directory_exists():
 def get_path_to_user_token():
     """ Returns the path to the user directory """
 
-    return os.path.join(os.environ["HOME"], '.code-clinic/user_token.pickle')
+    return os.path.join(get_path_to_token_directory(), 'user_token.pickle')
 
 
 def get_path_to_clinic_token() -> str:

@@ -20,7 +20,7 @@ def get_path_to_clinic_directory():
     Returns the path to the clinic directory.
     """
 
-    return os.path.join(os.environ["HOME"], 'code-clinic')
+    return os.path.join(os.environ["HOME"], '.config/code_clinic')
 
 
 def get_path_to_config_file():
@@ -28,7 +28,7 @@ def get_path_to_config_file():
     Returns the path to the config file in the user's home directory'
     """
 
-    return os.path.join(os.environ["HOME"], 'code-clinic/config.json')
+    return os.path.join(get_path_to_clinic_directory(), 'config.json')
 
 
 def update_config(email, location, days='7'):
