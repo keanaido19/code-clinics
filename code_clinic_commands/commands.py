@@ -31,6 +31,16 @@ def login() -> None:
     code_clinic_output.login_results()
 
 
+def logout():
+    '''Allows the user to log out of the system.
+    '''
+    if code_clinic_input.input_logout_prompt():
+        code_clinic_config.delete_config_file()
+        code_clinic_token.delete_user_token()
+        code_clinic_calendar_files.delete_calendar_files()
+        code_clinic_output.output_logout_success()
+
+
 def help_command():
     """
     Contains a list of valid commands.
@@ -379,6 +389,9 @@ def command_handler(command):
         return
     elif command == 'login':
         login()
+        return
+    elif command == 'logout':
+        logout()
         return
     elif code_clinic_token.check_user_token_expired():
         code_clinic_output.output_token_expired()
