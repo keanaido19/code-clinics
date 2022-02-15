@@ -11,7 +11,7 @@ def get_path_to_calendar_file_directory():
     Returns the path to the directory that will contain both user and clinic calendar data
     """
 
-    return os.path.join(os.environ["HOME"], '.local/code-clinic')
+    return os.path.join(os.environ["HOME"], '.local/code_clinic/calendar_files')
 
 
 def create_calendar_file_directory():
