@@ -98,24 +98,16 @@ def create_clinic_token() -> None:
             ...
 
 
-def connect(connection_name: str, port_number: int) -> credentials.Credentials:
+def connect() -> credentials.Credentials:
     """
     Connects to google calendar oauth and returns token credentials
-    :param str connection_name: Name of the connection
-    :param int port_number: Port number
     :return: Token credentials
     """
     flow = InstalledAppFlow.from_client_config(
         SECRET_TOKEN, ["https://www.googleapis.com/auth/calendar"]
     )
 
-    while True:
-        try:
-            return flow.run_local_server(
-                localhost=connection_name, port=port_number
-            )
-        except OSError:
-            port_number += 1
+    return flow.run_local_server(port=0)
 
 
 def return_user_token_creds():
@@ -164,7 +156,7 @@ def get_user_token(username):
     else:
         create_user_token()
         code_clinic_output.output_login_prompt(username)
-        user_token = connect('user_login', 8080)
+        user_token = connect()
 
     update_user_token(user_token)
 
@@ -182,7 +174,7 @@ def get_clinic_token() -> credentials.Credentials:
     else:
         create_clinic_token()
         code_clinic_output.output_login_prompt('team.a.obliviate@gmail.com')
-        token_credentials = connect('clinic_login', 9090)
+        token_credentials = connect()
     update_clinic_token(token_credentials)
     return token_credentials
 
