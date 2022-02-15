@@ -2,9 +2,12 @@
 Output functions for Code Clinic Booking System
 
 """
+
 from __future__ import annotations
-import helpers
+
 import tabulate
+
+import helpers
 
 
 def welcome_msg():
@@ -42,9 +45,22 @@ def display_help():
 """)
 
 
-def login_prompt(username):
+def output_login_prompt(username: str):
+    """
+    Prints out a login message for the user
+    :param username: Username
+    :return: None
+    """
+    print(f"\nPlease login to your '{username}' google account.\n")
 
-    print(f'{username}: Please login')
+
+def output_login_failed(username: str) -> None:
+    """
+    Prints a login failed message for the user
+    :param str username: Username
+    :return: None
+    """
+    print(f"\nLogin for '{username}' failed. Please try again.\n")
 
 
 def output_token_expired() -> None:
