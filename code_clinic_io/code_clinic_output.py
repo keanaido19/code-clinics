@@ -324,3 +324,9 @@ def output_invalid_campus_location():
     :return: None
     """
     print('Campus location is invalid!')
+
+
+def output_logout_success():
+    '''It outputs a logout success message to the user.
+    '''
+    print('\nYou have been logged out successfully!\n')

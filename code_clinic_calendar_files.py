@@ -134,3 +134,24 @@ def update_clinic_calendar_file(calendar_event_data):
     if calendar_event_data != read_clinic_calendar_file():
         with open(get_path_to_clinic_calendar_file(), 'w') as calendar_data:
             json.dump(calendar_event_data, calendar_data, indent=4)
+
+
+def delete_user_calendar_file():
+    '''It deletes the file for the user's calendar.
+    '''
+    if check_if_user_calendar_file_exists():
+        os.remove(get_path_to_user_calendar_file())
+
+
+def delete_clinic_calendar_file():
+    '''It deletes the clinic's calendar file.
+    '''
+    if check_if_clinic_calendar_file_exists():
+        os.remove(get_path_to_clinic_calendar_file())
+
+
+def delete_calendar_files():
+    '''It deletes all the calendar files.
+    '''
+    delete_user_calendar_file()
+    delete_clinic_calendar_file()

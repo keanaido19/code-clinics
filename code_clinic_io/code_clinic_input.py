@@ -53,3 +53,9 @@ def input_confirm_cancel_code_clinic_time_slot(time_slot: str, user_type: str) \
     return input(f'\nConfirm cancellation of {user_type} booking for Code '
                  f'Clinic time slot : {time_slot}? (yes\\no)\n')\
         .lower().strip() in {'yes', 'y'}
+
+
+def input_logout_prompt():
+    '''It prompts the user to specify whether or not they do want to logout.
+    '''
+    return input('\nAre you sure you want to log out? (yes/no)\n').lower().strip() in {'yes', 'y'}
