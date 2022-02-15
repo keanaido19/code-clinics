@@ -22,6 +22,33 @@ def build_calendar_service(token_creds):
     return build('calendar', 'v3', credentials=token_creds)
 
 
+def verify_login(token_credentials: credentials.Credentials, username: str) -> \
+        bool:
+    """
+    Verifies that the username from the config file matches the username
+    from the token
+    :param credentials.Credentials token_credentials: Token Credentials
+    :param str username: Username
+    :return: Boolean value
+    """
+    calendar_service = build_calendar_service(token_credentials)
+    calendar_names: list = []
+    page_token = None
+
+    while True:
+        calendars: dict[str, dict] = \
+            calendar_service.calendarList().list(pageToken=page_token).execute()
+
+        for calendar in calendars['items']:
+            calendar_names.append(calendar['summary'])
+
+        page_token = calendars.get('nextPageToken')
+        if not page_token:
+            break
+
+    return username in calendar_names
+
+
 def get_calendar_data(calendar_service):
     """
     get the calendar data for a given number of days

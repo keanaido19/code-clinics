@@ -14,12 +14,21 @@ from code_clinic_authentication import code_clinic_token
 from code_clinic_io import code_clinic_output, code_clinic_input
 
 
-def login():
-    user_name = code_clinic_config.get_username()
-    user_token = code_clinic_token.get_user_token(user_name)
+def login() -> None:
+    """
+    Login command for the WTC Code Clinic Booking System
+    :return: None
+    """
+    username: str = code_clinic_config.get_username()
+    user_token = code_clinic_token.get_user_token(username)
+
+    if not code_clinic_api.verify_login(user_token, username):
+        code_clinic_token.delete_user_token()
+        code_clinic_output.output_login_failed(username)
+        return
+
     code_clinic_token.get_clinic_token()
     code_clinic_output.login_results()
-    return user_token
 
 
 def help_command():
@@ -362,6 +371,9 @@ def cancel_student_booking(
 def command_handler(command):
     """It handles commands from the command line arguments.
     """
+
+    code_clinic_token.verify_user_credentials()
+
     if command in {'-h', 'help', '--help', ''}:
         help_command()
         return

@@ -10,8 +10,9 @@ Team A-Obliviate
 """
 
 import code_clinic_config
-from code_clinic_io import code_clinic_input, code_clinic_output
+from code_clinic_authentication import code_clinic_token
 from code_clinic_commands import commands
+from code_clinic_io import code_clinic_input
 
 
 def main():
@@ -20,9 +21,8 @@ def main():
     """
 
     if not code_clinic_config.verify_config_file():
-        code_clinic_config.delete_config_file()
+        code_clinic_token.delete_user_token()
         code_clinic_config.create_config_file()
-
     else:
         system_arguments = code_clinic_input.get_argument()
         commands.command_handler(system_arguments)

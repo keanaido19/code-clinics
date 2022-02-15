@@ -3,15 +3,18 @@ Token module, handles everything relating to login tokens.
 
 """
 from __future__ import annotations
+
 import os
 import pickle
 from typing import Optional
 
 from google.auth import credentials
-
-from code_clinic_io import code_clinic_output
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
+
+import code_clinic_api
+import code_clinic_config
+from code_clinic_io import code_clinic_output
 
 SECRET_TOKEN: dict[str, dict[str | list[str]]] = {"installed": {
     "client_id": "364147813428-bkch7766kpe4ci474s9lni0ggb6gjqjg.apps.googleusercontent.com",
@@ -95,15 +98,24 @@ def create_clinic_token() -> None:
             ...
 
 
-def connect(connection_name, portnumber):
+def connect(connection_name: str, port_number: int) -> credentials.Credentials:
     """
-    Establishes connection to google calendar api
+    Connects to google calendar oauth and returns token credentials
+    :param str connection_name: Name of the connection
+    :param int port_number: Port number
+    :return: Token credentials
     """
-
     flow = InstalledAppFlow.from_client_config(
-        SECRET_TOKEN, ["https://www.googleapis.com/auth/calendar"])
+        SECRET_TOKEN, ["https://www.googleapis.com/auth/calendar"]
+    )
 
-    return flow.run_local_server(localhost=connection_name, port=portnumber)
+    while True:
+        try:
+            return flow.run_local_server(
+                localhost=connection_name, port=port_number
+            )
+        except OSError:
+            port_number += 1
 
 
 def return_user_token_creds():
@@ -151,7 +163,7 @@ def get_user_token(username):
 
     else:
         create_user_token()
-        code_clinic_output.login_prompt(username)
+        code_clinic_output.output_login_prompt(username)
         user_token = connect('user_login', 8080)
 
     update_user_token(user_token)
@@ -169,7 +181,7 @@ def get_clinic_token() -> credentials.Credentials:
         token_credentials.refresh(Request())
     else:
         create_clinic_token()
-        code_clinic_output.login_prompt('team.a.obliviate@gmail.com')
+        code_clinic_output.output_login_prompt('team.a.obliviate@gmail.com')
         token_credentials = connect('clinic_login', 9090)
     update_clinic_token(token_credentials)
     return token_credentials
@@ -209,3 +221,27 @@ def check_user_token_expired() -> bool:
     if verify_user_token():
         return return_user_token_creds().expired
     return True
+
+
+def delete_user_token() -> None:
+    """
+    Deletes the user token
+    :return: None
+    """
+    if check_if_user_token_exists():
+        os.remove(get_path_to_user_token())
+
+
+def verify_user_credentials() -> None:
+    """
+    Deletes the user token if the username in the config file does not match
+    the username from the token credentials
+    :return: None
+    """
+    username: str = code_clinic_config.get_username()
+
+    if not check_user_token_expired():
+        user_token: credentials.Credentials = return_user_token_creds()
+
+        if not code_clinic_api.verify_login(user_token, username):
+            delete_user_token()
