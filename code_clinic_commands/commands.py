@@ -48,34 +48,43 @@ def help_command():
     code_clinic_output.display_help()
 
 
-def update_local_calendar(
-        token_credentials: credentials.Credentials,
-        file_name: str) -> None:
+def get_calendar_data(token_credentials):
     """
-    Updates the specified calendar file with the Google Calendar data
-    :param credentials.Credentials token_credentials: Token credentials
-    :param str file_name: Reference to the specified calendar file
-    :return: None
+    Function allows user to retrieve their calendar data from google
     """
-    calendar_data: dict[str, list[dict]] = \
-        code_clinic_api.get_formatted_calendar_events(token_credentials)
+    return code_clinic_api.get_formatted_calendar_events(token_credentials)
 
-    if file_name == 'user':
-        code_clinic_calendar_files.update_user_calendar_file(calendar_data)
-    elif file_name == 'clinic':
-        code_clinic_calendar_files.update_clinic_calendar_file(calendar_data)
+def update_local_user_calendar(user_credentials):
+    """
+    Function updates local user calender if it is not the same as what was read from google
+    i.e allows the two calendars to sync
+    """
+    calendar_data: dict[str, list[dict]] = get_calendar_data(user_credentials)
+    code_clinic_calendar_files.update_user_calendar_file(calendar_data)
 
 
-def display_calendar(
-        token_credentials: credentials.Credentials,
-        file_name: str) -> None:
+def update_local_clinic_calendar(clinic_credentials):
+    """
+    Function updates local clinic calender if it is not the same as what was read from google
+    i.e syncs the calendars
+    """
+    calendar_data: dict[str, list[dict]] = get_calendar_data(clinic_credentials)
+    code_clinic_calendar_files.update_clinic_calendar_file(calendar_data)
+  
+
+def update_local_calendars(user_credentials,clinic_credentials):
+    """
+    Function updates local calendar files
+    """
+    update_local_user_calendar(user_credentials)
+    update_local_clinic_calendar(clinic_credentials)
+
+def display_calendar(file_name: str) -> None:
     """
     Command to display the Google Calendar events
-    :param credentials.Credentials token_credentials:Token credentials
     :param str file_name: Reference to the specified calendar file
     :return: None
     """
-    update_local_calendar(token_credentials, file_name)
     calendar_events: dict[str, list[dict]] = {}
 
     if file_name == 'user':
@@ -86,15 +95,11 @@ def display_calendar(
     code_clinic_output.output_calendar(calendar_events)
 
 
-def display_volunteer_slots(clinic_credentials: credentials.Credentials) \
-        -> None:
+def display_volunteer_slots() -> None:
     """
     Displays the Code Clinic time slots to the user
-    :param credentials. Credentials clinic_credentials: Clinic token credentials
     :return: None
     """
-    update_local_calendar(clinic_credentials, 'clinic')
-
     clinic_calendar_event_data: dict[str, list[dict]] = \
         code_clinic_calendar_files.read_clinic_calendar_file()
 
@@ -119,9 +124,6 @@ def book_volunteer_slot(clinic_credentials: credentials.Credentials,
     :param str command: WTC Code Clinic Booking System command
     :return: None
     """
-    # Updates local clinic calendar file if data is not up-to-date
-    update_local_calendar(clinic_credentials, 'clinic')
-
     # Retrieves the volunteer time slot index from the command
     volunteer_slot_key: str = get_command_argument(command)
 
@@ -156,16 +158,11 @@ def book_volunteer_slot(clinic_credentials: credentials.Credentials,
         code_clinic_output.output_booking_successful(volunteer_slot['datetime'])
 
 
-def display_user_volunteer_bookings(clinic_credentials: credentials.Credentials) \
-        -> None:
+def display_user_volunteer_bookings() -> None:
     """
     Displays the WTC Code Clinic time slots booked by the user as a volunteer
-    :param credentials.Credentials clinic_credentials: Clinic token credentials
     :return: None
     """
-    # Updates local user calendar file if data is not up-to-date
-    update_local_calendar(clinic_credentials, 'clinic')
-
     # Retrieves the user calendar event data from the local file
     user_calendar_event_data: dict[str, list[dict]] = \
         code_clinic_calendar_files.read_clinic_calendar_file()
@@ -188,9 +185,6 @@ def cancel_volunteer_booking(
     :param str command: WTC Code Clinic Booking System command
     :return: None
     """
-    # Updates local clinic calendar file if data is not up-to-date
-    update_local_calendar(clinic_credentials, 'clinic')
-
     # Retrieves the cancel volunteer time slot index from the command
     volunteer_slot_key: str = get_command_argument(command)
 
@@ -231,16 +225,12 @@ def cancel_volunteer_booking(
             volunteer_slot['datetime'], 'volunteer')
 
 
-def display_student_slots(clinic_credentials: credentials.Credentials) -> None:
+def display_student_slots() -> None:
     """
     Command to allow the user to view the available WTC Code Clinic Booking
     System time slots that can be booked as a student
-    :param credentials.Credentials clinic_credentials: Clinic token credentials
     :return: None
     """
-    # Updates local clinic calendar file if data is not up-to-date
-    update_local_calendar(clinic_credentials, 'clinic')
-
     # Retrieves the clinic calendar event data from the local file
     clinic_calendar_event_data: dict[str, list[dict]] = \
         code_clinic_calendar_files.read_clinic_calendar_file()
@@ -263,9 +253,6 @@ def book_student_slot(
     :param str command: WTC Code Clinic Booking System command
     :return: None
     """
-    # Updates local clinic calendar file if data is not up-to-date
-    update_local_calendar(clinic_credentials, 'clinic')
-
     # Retrieves the student time slot index from the command
     student_slot_key: str = get_command_argument(command)
 
@@ -304,16 +291,11 @@ def book_student_slot(
         code_clinic_output.output_booking_successful(student_slot['datetime'])
 
 
-def display_user_student_bookings(clinic_credentials: credentials.Credentials) \
-        -> None:
+def display_user_student_bookings() -> None:
     """
     Displays the WTC Code Clinic time slots booked by the user as a student
-    :param credentials.Credentials clinic_credentials: Clinic token credentials
     :return: None
     """
-    # Updates local user calendar file if data is not up-to-date
-    update_local_calendar(clinic_credentials, 'clinic')
-
     # Retrieves the user calendar event data from the local file
     user_calendar_event_data: dict[str, list[dict]] = \
         code_clinic_calendar_files.read_clinic_calendar_file()
@@ -336,9 +318,6 @@ def cancel_student_booking(
     :param str command: WTC Code Clinic Booking System command
     :return: None
     """
-    # Updates local clinic calendar file if data is not up-to-date
-    update_local_calendar(clinic_credentials, 'clinic')
-
     # Retrieves the cancel student time slot index from the command
     student_slot_key: str = get_command_argument(command)
 
@@ -403,28 +382,32 @@ def command_handler(command):
     clinic_credentials: credentials.Credentials = \
         code_clinic_token.return_clinic_credentials()
 
+    update_local_calendars(user_credentials,clinic_credentials)
+
     if command == 'my_calendar':
-        display_calendar(user_credentials, 'user')
+        display_calendar('user')
     elif command == 'clinic_calendar':
-        display_calendar(clinic_credentials, 'clinic')
+        display_calendar('clinic')
     elif command == 'volunteer_slots':
-        display_volunteer_slots(clinic_credentials)
+        display_volunteer_slots()
     elif re.match(r'^book_volunteer_slot \d+$', command):
         book_volunteer_slot(clinic_credentials, command)
     elif command == 'my_volunteer_bookings':
-        display_user_volunteer_bookings(clinic_credentials)
+        display_user_volunteer_bookings()
     elif re.match(r'^cancel_volunteer_booking \d+$', command):
         cancel_volunteer_booking(clinic_credentials, command)
     elif command == 'student_slots':
-        display_student_slots(clinic_credentials)
+        display_student_slots()
     elif re.match(r'^book_student_slot \d+$', command):
         book_student_slot(clinic_credentials, command)
     elif command == 'my_student_bookings':
-        display_user_student_bookings(clinic_credentials)
+        display_user_student_bookings()
     elif re.match(r'^cancel_student_booking \d+$', command):
         cancel_student_booking(clinic_credentials, command)
     elif re.match(r'^set_calendar_size \d+$', command):
         set_calendar_size(command)
+    
+    update_local_calendars(user_credentials,clinic_credentials)
 
 
 def set_calendar_size(command):
