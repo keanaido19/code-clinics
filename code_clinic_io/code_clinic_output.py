@@ -330,3 +330,9 @@ def output_logout_success():
     '''It outputs a logout success message to the user.
     '''
     print('\nYou have been logged out successfully!\n')
+
+def output_invalid_code_clinic_command(command):
+    """
+    Function hadles the printing of error message if an invalid command was entered
+    """
+    print(f"\nerror: Found argument '{command}' which wasn't expected, or isn't valid in this context\n\nUSAGE:\n    code-clinic [COMMAND]\n\nFor more information try --help\n")
