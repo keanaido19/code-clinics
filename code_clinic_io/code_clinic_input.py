@@ -47,7 +47,7 @@ def input_confirm_cancel_code_clinic_time_slot(time_slot: str, user_type: str) \
     Asks the user to confirm whether they want to cancel their volunteer
     booking at the specified time slot
     :param str time_slot: Specified time slot to book
-    :param str user_type: str user_type: Type of user, volunteer or student
+    :param str user_type: Type of user, volunteer or student
     :return: Boolean value
     """
     return input(f'\nConfirm cancellation of {user_type} booking for Code '

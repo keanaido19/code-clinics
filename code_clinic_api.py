@@ -9,7 +9,7 @@ import itertools
 from google.auth import credentials
 from googleapiclient import discovery
 from googleapiclient.discovery import build
-
+import code_clinic_calendar_export
 import code_clinic_config
 import helpers
 
@@ -104,7 +104,7 @@ def book_code_clinic_time_slot(
     Books the given WTC Code Clinic Booking System time slot
     :param credentials.Credentials clinic_credentials: Clinic token credentials
     :param str event_id: Calendar event id
-    :param str user_type: str user_type: Type of user, volunteer or student
+    :param str user_type: Type of user, volunteer or student
     :return: None
     """
     # Builds Google Calendar API service
@@ -142,6 +142,8 @@ def book_code_clinic_time_slot(
     # user as an attendee
     calendar_service.events().update(
         calendarId='primary', eventId=event_id, body=calendar_event).execute()
+
+    code_clinic_calendar_export.export_to_ical(calendar_event, user_type)
 
 
 def cancel_booking(

@@ -257,7 +257,7 @@ def output_cancel_volunteer_booking_slot_invalid() -> None:
     print("\nThe time slot you wish to cancel as a volunteer has not been "
           "booked by you, or has been booked by a student.\n\nPlease refer to "
           "your volunteer bookings using\n\n    code-clinic "
-          "my_volunteer_bookings\n")
+          "volunteer_bookings\n")
 
 
 def output_cancel_student_booking_slot_invalid() -> None:
@@ -267,14 +267,14 @@ def output_cancel_student_booking_slot_invalid() -> None:
     """
     print("\nThe time slot you wish to cancel as a student has not been "
           "booked by you.\n\nPlease refer to your student bookings using"
-          "\n\n    code-clinic my_student_bookings\n")
+          "\n\n    code-clinic student_bookings\n")
 
 
 def output_cancel_booking_successful(time_slot: str, user_type: str) -> None:
     """
     Prints out a cancellation successful message to the user
     :param str time_slot: Specified time slot to cancel
-    :param str user_type: str user_type: Type of user, volunteer or student
+    :param str user_type: Type of user, volunteer or student
     :return: Boolean value
     """
     print(f'\nCode Clinic {user_type} booking for time slot - {time_slot} - '

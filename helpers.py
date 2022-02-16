@@ -641,6 +641,19 @@ def get_token_expiry_time(token):
 
     delta_as_time_obj = time.gmtime(delta.total_seconds())
 
-    hours, minutes = map(int, time.strftime('%H:%M', delta_as_time_obj).split(':'))
+    hours, minutes = \
+        map(int, time.strftime('%H:%M', delta_as_time_obj).split(':'))
     
     return f'Token expires in {hours} hours {minutes} minutes at {expiry_time}.'
+
+
+def create_file_name_from_calendar_event(calendar_event: dict) -> str:
+    """
+    Creates a file name for an event by using its start and end datetime
+    :param dict calendar_event: Calendar event
+    :return: File name
+    """
+    date: str = get_calendar_event_start(calendar_event).strftime('%a_%d-%b-%Y')
+    start_time: str = get_calendar_event_start(calendar_event).strftime('%Hh%m')
+    end_time: str = get_calendar_event_end(calendar_event).strftime('%Hh%m')
+    return f'{date}_{start_time}-{end_time}'
