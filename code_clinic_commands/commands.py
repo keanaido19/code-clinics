@@ -384,7 +384,7 @@ def command_handler(command):
 
     update_local_calendars(user_credentials,clinic_credentials)
 
-    if command == 'my_calendar':
+    if command == 'calendar':
         display_calendar('user')
     elif command == 'clinic_calendar':
         display_calendar('clinic')
@@ -392,7 +392,7 @@ def command_handler(command):
         display_volunteer_slots()
     elif re.match(r'^book_volunteer_slot \d+$', command):
         book_volunteer_slot(clinic_credentials, command)
-    elif command == 'my_volunteer_bookings':
+    elif command == 'volunteer_bookings':
         display_user_volunteer_bookings()
     elif re.match(r'^cancel_volunteer_booking \d+$', command):
         cancel_volunteer_booking(clinic_credentials, command)
@@ -400,7 +400,7 @@ def command_handler(command):
         display_student_slots()
     elif re.match(r'^book_student_slot \d+$', command):
         book_student_slot(clinic_credentials, command)
-    elif command == 'my_student_bookings':
+    elif command == 'student_bookings':
         display_user_student_bookings()
     elif re.match(r'^cancel_student_booking \d+$', command):
         cancel_student_booking(clinic_credentials, command)
