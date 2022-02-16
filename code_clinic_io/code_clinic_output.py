@@ -14,7 +14,8 @@ def welcome_msg():
     """It displays a welcome message to the user.
     """
 
-    print("Welcome to WTC Code Clinic Booking System\nYou do not appear to have a config file defined...")
+    print("Welcome to WTC Code Clinic Booking System\nYou do not appear to "
+          "have a config file defined...")
 
 
 def login_results(token):
@@ -45,14 +46,14 @@ COMMANDS:
     calendar                            Displays the user's calendar
     cancel_student_booking (index)      Allows a student to cancel a booking
     cancel_volunteer_booking (index)    Allows a volunteer to cancel a booking
-    clinic_calendar                     Displays the clinic's calendar
-    login                               Allows the user to login the system
-    logout                              Allows the user to logout of the system
+    clinic_calendar                     Displays the Code Clinic's calendar
+    login                               Allows the user to login to the Code Clinic Booking System
+    logout                              Allows the user to logout of the Code Clinic Booking System
     set_calendar_size                   Allows the user to specify the number of days to view on the calendar
-    student_bookings                    Displays slots a student has booked
-    student_slots                       Displays available slots for the student to book
-    volunteer_bookings                  Displays slots a volunteer has booked
-    volunteer_slots                     Displays available slots for the volunteer to book
+    student_bookings                    Displays Code Clinic slots a student has booked
+    student_slots                       Displays available Code Clinic slots for a student to book
+    volunteer_bookings                  Displays Code Clinic slots a volunteer has booked
+    volunteer_slots                     Displays available Code Clinic slots for a volunteer to book
 """)
 
 
@@ -136,8 +137,11 @@ def output_volunteer_slots(clinic_calendar_event_data: dict[str, list[dict]]) \
             stralign='center',
             tablefmt='fancy_grid')
     )
+    print('\nIf the table is displayed incorrectly - please press\n\n    '
+          '"Ctrl"  +  "-"  to Zoom Out\n\n    "Ctrl"  +  "Shift"  +  "+"  to '
+          'Zoom In\n')
     print("\nAn indexed volunteer slot can be booked by using"
-          "\n\n    code-clinic book_volunteer_slot <index>\n")
+          "\n\n    code-clinic book_volunteer_slot (index)\n")
 
 
 def output_volunteer_booking_slot_invalid() -> None:
@@ -205,7 +209,7 @@ def output_student_slots(
     )
 
     print("\nAn indexed student slot can be booked by using"
-          "\n\n    code-clinic book_student_slot <index>\n")
+          "\n\n    code-clinic book_student_slot (index)\n")
 
 
 def output_no_available_user_booked_volunteer_slots() -> None:
@@ -242,7 +246,7 @@ def output_user_booked_volunteer_slots(
             tablefmt='fancy_grid')
     )
     print("\nAn indexed volunteer booking can be canceled by using"
-          "\n\n    code-clinic cancel_volunteer_booking <index>\n")
+          "\n\n    code-clinic cancel_volunteer_booking (index)\n")
 
 
 def output_cancel_volunteer_booking_slot_invalid() -> None:
@@ -311,7 +315,7 @@ def output_user_booked_student_slots(
             tablefmt='fancy_grid')
     )
     print("\nAn indexed student booking can be canceled by using"
-          "\n\n    code-clinic cancel_student_booking <index>\n")
+          "\n\n    code-clinic cancel_student_booking (index)\n")
 
 
 def output_calendar_size_updated():
@@ -338,12 +342,17 @@ def output_invalid_campus_location():
 
 
 def output_logout_success():
-    '''It outputs a logout success message to the user.
+    '''
+    It outputs a logout success message to the user.
     '''
     print('\nYou have been logged out successfully!\n')
 
+
 def output_invalid_code_clinic_command(command):
     """
-    Function hadles the printing of error message if an invalid command was entered
+    Function handles the printing of error message if an invalid command was
+    entered
     """
-    print(f"\nerror: Found argument '{command}' which wasn't expected, or isn't valid in this context\n\nUSAGE:\n    code-clinic [COMMAND]\n\nFor more information try --help\n")
+    print(f"\nerror: Found argument '{command}' which wasn't expected, or "
+          f"isn't valid in this context\n\nUSAGE:\n    code-clinic [FLAGS] ["
+          f"COMMAND]\n\nFor more information try --help\n")
