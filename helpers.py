@@ -4,6 +4,7 @@ Additional functions to assist other modules.
 
 from __future__ import annotations
 import datetime
+import time
 
 from pytz import timezone
 import re
@@ -628,3 +629,18 @@ def adjust_days_for_calendar_size(days: int) -> int:
     """
     return days if datetime.time(17, 30) < datetime.datetime.now().time() else \
         days - 1
+
+
+def get_token_expiry_time(token):
+    expiry_time = timezone('UTC')\
+        .localize(token.expiry)\
+        .astimezone(timezone('Africa/Johannesburg'))\
+        .strftime('%Y-%m-%d %H:%M:%S %Z')
+
+    delta = token.expiry - datetime.datetime.utcnow()
+
+    delta_as_time_obj = time.gmtime(delta.total_seconds())
+
+    hours, minutes = map(int, time.strftime('%H:%M', delta_as_time_obj).split(':'))
+    
+    return f'Token expires in {hours} hours {minutes} minutes at {expiry_time}.'
