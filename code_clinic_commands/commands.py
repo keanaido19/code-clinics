@@ -28,7 +28,7 @@ def login() -> None:
         return
 
     code_clinic_token.get_clinic_token()
-    code_clinic_output.login_results()
+    code_clinic_output.login_results(user_token)
 
 
 def logout():

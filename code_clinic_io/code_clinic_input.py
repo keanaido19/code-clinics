@@ -38,7 +38,7 @@ def get_location():
     """
 
     return input(
-        'Please enter your campus location (DBN\\JHB\\CPT):\n').strip()
+        'Please enter your campus location (DBN\\JHB\\CPT):\n').upper().strip()
 
 
 def input_confirm_cancel_code_clinic_time_slot(time_slot: str, user_type: str) \
@@ -56,6 +56,8 @@ def input_confirm_cancel_code_clinic_time_slot(time_slot: str, user_type: str) \
 
 
 def input_logout_prompt():
-    '''It prompts the user to specify whether or not they do want to logout.
     '''
-    return input('\nAre you sure you want to log out? (yes/no)\n').lower().strip() in {'yes', 'y'}
+    It prompts the user to specify whether or not they do want to logout.
+    '''
+    return input('\nAre you sure you want to log out? (yes/no)\n')\
+               .lower().strip() in {'yes', 'y'}
