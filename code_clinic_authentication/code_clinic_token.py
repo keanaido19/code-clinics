@@ -4,19 +4,18 @@ Token module, handles everything relating to login tokens.
 """
 from __future__ import annotations
 
+import copy
+import datetime
 import os
 import pickle
-from typing import Optional
 
-from google.oauth2.credentials import Credentials
 from google.auth import credentials
 from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 
-import copy
 import code_clinic_api
 import code_clinic_config
-import datetime
 from code_clinic_io import code_clinic_output
 
 SECRET_TOKEN: dict[str, dict[str | list[str]]] = {"installed": {
@@ -66,26 +65,10 @@ def get_path_to_user_token():
     return os.path.join(get_path_to_token_directory(), 'user_token.pickle')
 
 
-def get_path_to_clinic_token() -> str:
-    """
-    Returns the path to the code clinic's token
-    :return: Path to the code clinic's token
-    """
-    return os.path.join(get_path_to_token_directory(), 'clinic_token.pickle')
-
-
 def check_if_user_token_exists():
     """Check if a user token exists"""
 
     return os.path.exists(get_path_to_user_token())
-
-
-def check_if_clinic_token_exists() -> bool:
-    """
-    Checks if the clinic token exists
-    :return: Boolean value
-    """
-    return os.path.exists(get_path_to_clinic_token())
 
 
 def create_user_token():
@@ -98,18 +81,6 @@ def create_user_token():
     if not check_if_user_token_exists():
         with open(get_path_to_user_token(), 'wb') as token:
             pass
-
-
-def create_clinic_token() -> None:
-    """
-    Creates an empty clinic token
-    :return: None
-    """
-    if not check_if_clinic_token_exists():
-        if not check_if_token_directory_exists():
-            create_token_directory()
-        with open(get_path_to_clinic_token(), 'wb'):
-            ...
 
 
 def connect() -> credentials.Credentials:
@@ -136,7 +107,9 @@ def return_clinic_credentials() -> credentials.Credentials:
     :return: Credential data
     """
     clinic_token_copy = copy.deepcopy(CLINIC_TOKEN)
-    clinic_token_copy['expiry'] = (datetime.datetime.now() + datetime.timedelta(hours= 1)).isoformat() + '+02:00'
+    clinic_token_copy['expiry'] = \
+        (datetime.datetime.now() + datetime.timedelta(hours= 1))\
+        .isoformat() + '+02:00'
     return Credentials.from_authorized_user_info(clinic_token_copy,SCOPES)
 
 
@@ -146,17 +119,6 @@ def update_user_token(user_token_creds):
     """
     with open(get_path_to_user_token(), 'wb') as token:
         pickle.dump(user_token_creds, token)
-
-
-def update_clinic_token(token_credentials: Optional[credentials.Credentials])\
-        -> None:
-    """
-    Updates the clinic token with login credential data
-    :param credentials.Credentials token_credentials: Credential data
-    :return: None
-    """
-    with open(get_path_to_clinic_token(), 'wb') as clinic_token:
-        pickle.dump(token_credentials, clinic_token)
 
 
 def get_user_token(username):
@@ -176,22 +138,6 @@ def get_user_token(username):
     return user_token
 
 
-def get_clinic_token() -> credentials.Credentials:
-    """
-    Gets the clinic token data
-    :return: Clinic token credentials
-    """
-    if check_if_clinic_token_exists():
-        token_credentials = return_clinic_credentials()
-        token_credentials.refresh(Request())
-    else:
-        create_clinic_token()
-        code_clinic_output.output_login_prompt('team.a.obliviate@gmail.com')
-        token_credentials = connect()
-    update_clinic_token(token_credentials)
-    return token_credentials
-
-
 def verify_user_token() -> bool:
     """
     Checks if the user token is valid or not
@@ -201,19 +147,6 @@ def verify_user_token() -> bool:
         with open(get_path_to_user_token(), 'rb') as user_token:
             user_credentials = pickle.load(user_token)
             return user_credentials.valid
-    except (EOFError, pickle.UnpicklingError, FileNotFoundError):
-        return False
-
-
-def verify_clinic_token() -> bool:
-    """
-    Checks if the clinic token is valid or not
-    :return: Boolean value
-    """
-    try:
-        with open(get_path_to_clinic_token(), 'rb') as clinic_token:
-            clinic_credentials = pickle.load(clinic_token)
-            return clinic_credentials.valid
     except (EOFError, pickle.UnpicklingError, FileNotFoundError):
         return False
 

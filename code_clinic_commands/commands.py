@@ -31,8 +31,10 @@ def login() -> None:
 
 
 def logout():
-    '''Allows the user to log out of the system.
     '''
+    Allows the user to log out of the system.
+    '''
+
     if code_clinic_input.input_logout_prompt():
         code_clinic_config.delete_config_file()
         code_clinic_token.delete_user_token()
