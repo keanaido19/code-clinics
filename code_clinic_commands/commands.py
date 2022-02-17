@@ -27,7 +27,6 @@ def login() -> None:
         code_clinic_output.output_login_failed(username)
         return
 
-    code_clinic_token.get_clinic_token()
     code_clinic_output.login_results(user_token)
 
 

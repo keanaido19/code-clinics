@@ -8,12 +8,15 @@ import os
 import pickle
 from typing import Optional
 
+from google.oauth2.credentials import Credentials
 from google.auth import credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 
+import copy
 import code_clinic_api
 import code_clinic_config
+import datetime
 from code_clinic_io import code_clinic_output
 
 SECRET_TOKEN: dict[str, dict[str | list[str]]] = {"installed": {
@@ -26,6 +29,17 @@ SECRET_TOKEN: dict[str, dict[str | list[str]]] = {"installed": {
     "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
     }
 }
+
+CLINIC_TOKEN = \
+    {"token": "ya29.A0ARrdaM_Csd-9HxbnEE7f7gFg9PAiyouIu7Y8Lv86OtKZ3YN5EKTmS5GTbutpXjrQFIqb8cCAGZYAmBYhBKWBBhGpSTMh7liim7BA2CGqN1A-ZzB4eCKUlQ1_TN2BgnFEIPkyTl_cgFLJCVT1Sv54LgqLQt70",
+     "refresh_token": "1//036bZqxhXOEWICgYIARAAGAMSNwF-L9Irl8WctElPwg5DLT3oR7W3Zea4_tERBbmsjz3rZ02A-75NRasw-KAd4a761U4FzhZoEcM",
+     "token_uri": "https://oauth2.googleapis.com/token",
+     "client_id": "364147813428-bkch7766kpe4ci474s9lni0ggb6gjqjg.apps.googleusercontent.com",
+     "client_secret": "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",
+     "scopes": ["https://www.googleapis.com/auth/calendar"],
+     "expiry": "2022-02-15T17:27:07.108333Z"}
+
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 
 def create_token_directory():
@@ -103,9 +117,7 @@ def connect() -> credentials.Credentials:
     Connects to google calendar oauth and returns token credentials
     :return: Token credentials
     """
-    flow = InstalledAppFlow.from_client_config(
-        SECRET_TOKEN, ["https://www.googleapis.com/auth/calendar"]
-    )
+    flow = InstalledAppFlow.from_client_config(SECRET_TOKEN, SCOPES)
 
     return flow.run_local_server(port=0)
 
@@ -120,11 +132,12 @@ def return_user_token_creds():
 
 def return_clinic_credentials() -> credentials.Credentials:
     """
-    Returns credential data from user token
+    Returns credential data from clinic token
     :return: Credential data
     """
-    with open(get_path_to_clinic_token(), 'rb') as clinic_token:
-        return pickle.load(clinic_token)
+    clinic_token_copy = copy.deepcopy(CLINIC_TOKEN)
+    clinic_token_copy['expiry'] = (datetime.datetime.now() + datetime.timedelta(hours= 1)).isoformat() + '+02:00'
+    return Credentials.from_authorized_user_info(clinic_token_copy,SCOPES)
 
 
 def update_user_token(user_token_creds):
