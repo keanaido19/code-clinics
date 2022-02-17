@@ -15,6 +15,7 @@ from code_clinic_commands import commands
 from code_clinic_io import code_clinic_input,code_clinic_output
 import re
 
+
 def validate_code_clinic_command(command):
     """It handles the validation of commands from the command line arguments.
     returns True if command is valid
@@ -50,7 +51,6 @@ def validate_code_clinic_command(command):
         return True
     return False
     
-
 
 def main():
     """
