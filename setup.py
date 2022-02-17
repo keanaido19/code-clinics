@@ -10,7 +10,7 @@ setup(
     packages=['code_clinic', 'code_clinic_io', 'code_clinic_tests',
               'code_clinic_commands', 'code_clinic_authentication'],
     py_modules=['code_clinic_api', 'code_clinic_calendar_export',
-                'code_clinic_calendar_files', 'code_clinic_config', 'helpers'],
+                'code_clinic_calendar_files', 'code_clinic_config', 'helpers','test_base', 'test_code_clinic_calendar_files','test_code_clinic_input','test_code_clinic_output', 'test_config','test_helpers'],
     url='https://gitlab.wethinkco.de/noksitho021/code_clinics_group_project',
     author='Team A Obliviate',
     author_email='danmulopo021@student.wethinkcode.co.za, '
