@@ -17,7 +17,8 @@ def get_username():
     """
 
     return \
-        input('Please provide the username for the booking system:\n').strip()
+        input('Please provide the username(email address) for the booking '
+              'system:\n').strip()
 
 
 def input_confirm_time_slot(time_slot: str, user_type: str) \

@@ -27,13 +27,14 @@ def login() -> None:
         code_clinic_output.output_login_failed(username)
         return
 
-    code_clinic_token.get_clinic_token()
     code_clinic_output.login_results(user_token)
 
 
 def logout():
-    '''Allows the user to log out of the system.
     '''
+    Allows the user to log out of the system.
+    '''
+
     if code_clinic_input.input_logout_prompt():
         code_clinic_config.delete_config_file()
         code_clinic_token.delete_user_token()
