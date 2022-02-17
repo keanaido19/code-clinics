@@ -9,6 +9,6 @@ Team A Obliviate:
 Installation
 ======================================================================
 
-Use `python3`
+Use `python3.9`
 
-    sudo python3 setup.py install
+    sudo python3.9 setup.py install
