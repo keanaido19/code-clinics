@@ -34,3 +34,4 @@ student_bookings                    Displays Code Clinic slots a student has boo
 student_slots                       Displays available Code Clinic slots for a student to book
 volunteer_bookings                  Displays Code Clinic slots a volunteer has booked
 volunteer_slots                     Displays available Code Clinic slots for a volunteer to book
+
