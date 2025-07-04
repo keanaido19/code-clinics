@@ -25,3 +25,9 @@ Below is a list of all the commands users can type to interact with the system:
 |student_slots                       |Displays available Code Clinic slots for a student to book|
 |volunteer_bookings                  |Displays Code Clinic slots a volunteer has booked|
 |volunteer_slots                     |Displays available Code Clinic slots for a volunteer to book|
+
+## Learning Objectives
+- AGILE Methodology
+- Python Programming Proficiency
+- Team Collaboration
+- Web-based source control (GitLab)
