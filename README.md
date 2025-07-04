@@ -6,17 +6,6 @@ Team A Obliviate:
  - mzomdubeki021@student.wethinkcode.co.za (Mzokhulayo Mdubeki)
  - noksitho021@student.wethinkcode.co.za (Nokwanda Sithole)
 
-
-
-Installation
-======================================================================
-
-Use `python3.9`
-
-    sudo python3.9 setup.py install
-
-
-
 The WeThinkCode code clinic's booking system brings together students who need help with code and volunteers who are willing to offer that help. The system allows both students and volunteers to login to the system, book slots, create, edit or delete events and view the code's calendar.
 
 Below is a list of all the commands users can type to interact with the system:
